@@ -23,9 +23,21 @@ Our platform is designed to empower individuals to achieve their health and well
 ## To run the server
 1. In vscode, open the folder `Fitness and Nutrition platform/hello` and then type `python manage.py runserver` in a new terminal. Run this command from project directory (hello).
 
-#### Optional:
 
-Commands that may be needed `pip install django-mathfilters` , `pip install django-jazzmin` , `pip install Pillow` , `pip install cryptography`, `pip install django-allauth`, `pip install request`, `pip install django-middleware`
+Commands that may be required:
+
+
+- `pip install django`
+- `pip install django-jazzmin`
+- `pip install mysql`
+- `pip install middleware`
+- `pip install django-allauth`
+- `pip install django-mathfilters`
+- `pip install requests`
+- `pip install PyJWT`
+- `pip install cryptography`
+- `pip install pillow`
+
 
 
 ## Login Info:
@@ -36,9 +48,8 @@ password: 1
 Username: shuvo
 password: 12345578p
 
-
 Trainer username:
-apple
+username: apple
 password: applejuiceapple
 
 Owner username:
@@ -48,32 +59,30 @@ password: 147852mm
 Admin:
 username: admin
 password: admin
-
-
 ```
 
 ## Project Features:
 #### Module 1:
-Log in, Log out.  
-Sign Up / Registration. 
-View Profile
-Edit Profile. 
-Reset Password. 
-Gmail Authentication.  
-GitHub Authentication.  
-Delete Profile using the actual password.
+- Log in, Log out.  
+- Sign Up / Registration. 
+- View Profile
+- Edit Profile. 
+- Reset Password. 
+- Gmail Authentication.  
+- GitHub Authentication.  
+- Delete Profile using the actual password.
 
 
 ### Module 2:
-Notification reminder.
-Workout plan.
-Nutrition plan.
-BMI page.
-Exercise video tutorial play.
-Nutrition values.
-Support and FAQs.
+- Notification reminder.
+- Workout plan.
+- Nutrition plan.
+- BMI page.
+- Exercise video tutorial play.
+- Nutrition values.
+- Support and FAQs.
 
 
 
 ### Contributors
-https://github.com/FaisalAhmed21 | https://github.com/ShafiurShuvo | https://github.com/NaziaMumtahina | https://github.com/jerinsync
+[Faisal Ahmed](https://github.com/FaisalAhmed21) | [MD. Shafiur Rahman](https://github.com/ShafiurShuvo) | [Nazia Mumtahina](https://github.com/NaziaMumtahina) | [Sara Jerin Prithila](https://github.com/jerinsync)
