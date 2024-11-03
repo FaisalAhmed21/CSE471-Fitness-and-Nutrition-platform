@@ -50,7 +50,7 @@ password: 12345578p
 
 Trainer username:
 username: apple
-password: applejuiceapple
+password: apple123apple
 
 Owner username:
 username: aa
