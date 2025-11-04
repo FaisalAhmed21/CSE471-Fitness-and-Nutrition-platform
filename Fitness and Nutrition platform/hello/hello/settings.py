@@ -124,11 +124,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Dhaka'  # Set Bangladesh Time (BST)
+USE_TZ = True  # Make sure timezone support is enabled
 
-USE_I18N = True
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -149,6 +148,25 @@ AUTHENTICATION_BACKENDS = [
 
 SOCIALACCOUNT_LOGIN_ON_GET=True
 
+# Session settings - prevent timeout during OAuth flow
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = True  # Keep session alive
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'  # Important for OAuth redirects
+
+# Allauth settings for better Google sign-in
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Don't require email verification
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False  # Don't require username input on signup form
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create account on social login
+SOCIALACCOUNT_QUERY_EMAIL = True  # Request email from social providers
+SOCIALACCOUNT_ADAPTER = 'main.adapter.CustomSocialAccountAdapter'  # Custom adapter
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'  # Use 'https' in production
+SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens
+SOCIALACCOUNT_EMAIL_REQUIRED = False  # Don't show email confirmation form
+
 LOGIN_REDIRECT_URL = 'clientProfile'
 LOGOUT_REDIRECT_URL = 'clientLogin'
 
@@ -161,7 +179,10 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
-        }
+            'prompt': 'select_account',  # Allow user to select account every time
+        },
+        'VERIFIED_EMAIL': True,
+        'VERSION': 'v2',
     },
     'github': {
         'SCOPE': [
@@ -196,3 +217,8 @@ EMAIL_HOST_USER = 'buddiesfit50@gmail.com'
 EMAIL_HOST_PASSWORD = 'hhvqufjnzwkkboxn'
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = 'buddiesfit50@gmail.com'
+
+STRIPE_SECRET_KEY = 'YOUR_STRIPE_API_SECRET_KEY'
+STRIPE_PUBLISHABLE_KEY = 'YOUR_STRIPE_API_PUBLISHABLE_KEY'
+STRIPE_PUBLIC_KEY = STRIPE_PUBLISHABLE_KEY  # Alias for templates
+DOMAIN_URL = 'http://127.0.0.1:8000'  # No trailing slash
