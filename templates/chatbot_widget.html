@@ -1,0 +1,572 @@
+<!-- FitBot Chatbot Widget -->
+<!-- Ensure Font Awesome is loaded -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    .fitbot-container {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 999;
+        font-family: Arial, sans-serif;
+    }
+
+    .fitbot-toggle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);
+        color: white;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        box-shadow: 0 5px 20px rgba(193, 154, 107, 0.4);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .fitbot-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 25px rgba(193, 154, 107, 0.6);
+    }
+
+    .fitbot-toggle .bot-icon {
+        font-size: 1.8rem;
+    }
+
+    .fitbot-toggle .close-icon {
+        display: none;
+        font-size: 1.5rem;
+    }
+
+    .fitbot-toggle.active .bot-icon {
+        display: none;
+    }
+
+    .fitbot-toggle.active .close-icon {
+        display: block;
+    }
+
+    .fitbot-window {
+        display: none;
+        width: 380px;
+        height: 500px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        flex-direction: column;
+    }
+
+    .fitbot-window.active {
+        display: flex;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fitbot-header {
+        background: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .fitbot-header .bot-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .fitbot-header .bot-info h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .fitbot-header .bot-info p {
+        margin: 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    .fitbot-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8f9fa;
+    }
+
+    .message {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message.bot {
+        flex-direction: row;
+    }
+
+    .message.user {
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .message.bot .message-avatar {
+        background: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);
+        color: white;
+    }
+
+    .message.user .message-avatar {
+        background: #e9ecef;
+        color: #495057;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 12px 15px;
+        border-radius: 15px;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    .message.bot .message-content {
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 5px;
+    }
+
+    .message.user .message-content {
+        background: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
+
+    .typing-indicator {
+        display: none;
+        padding: 12px 15px;
+        background: white;
+        border-radius: 15px;
+        width: fit-content;
+    }
+
+    .typing-indicator.active {
+        display: block;
+    }
+
+    .typing-indicator span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #C19A6B;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+        }
+        30% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .fitbot-input {
+        padding: 15px 20px;
+        background: white;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .fitbot-input input {
+        flex: 1;
+        border: 2px solid #e9ecef;
+        border-radius: 25px;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .fitbot-input input:focus {
+        border-color: #C19A6B;
+    }
+
+    .fitbot-input button {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .fitbot-input button i {
+        color: white !important;
+        font-size: 1.1rem;
+        display: inline-block;
+    }
+    
+    .fitbot-input .fas {
+        font-family: "Font Awesome 5 Free" !important;
+        font-weight: 900;
+        -webkit-font-smoothing: antialiased;
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        line-height: 1;
+    }
+
+    .fitbot-input button:hover {
+        transform: scale(1.1);
+        background: linear-gradient(135deg, #8B7355 0%, #C19A6B 100%);
+    }
+
+    .fitbot-input button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .voice-btn {
+        position: relative;
+    }
+
+    .voice-btn.recording {
+        background: #dc3545 !important;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        }
+        50% {
+            box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+        }
+    }
+
+    .quick-suggestions {
+        padding: 10px 20px;
+        background: white;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        flex-wrap: wrap;
+    }
+
+    .quick-suggestion {
+        padding: 6px 12px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        color: #C19A6B;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.3s;
+    }
+
+    .quick-suggestion:hover {
+        background: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);
+        color: white;
+        border-color: transparent;
+    }
+
+    .fitbot-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .fitbot-messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .fitbot-messages::-webkit-scrollbar-thumb {
+        background: #C19A6B;
+        border-radius: 3px;
+    }
+
+    @media (max-width: 480px) {
+        .fitbot-window {
+            width: calc(100vw - 40px);
+            height: calc(100vh - 100px);
+            right: -30px;
+        }
+    }
+</style>
+
+<div class="fitbot-container">
+    <button class="fitbot-toggle" id="fitbotToggle">
+        <span class="bot-icon">🤖</span>
+        <span class="close-icon">✕</span>
+    </button>
+
+    <div class="fitbot-window" id="fitbotWindow">
+        <div class="fitbot-header">
+            <div class="bot-avatar">🤖</div>
+            <div class="bot-info">
+                <h3>FitBot</h3>
+                <p>Your AI Fitness Assistant</p>
+            </div>
+        </div>
+
+        <div class="fitbot-messages" id="fitbotMessages">
+            <div class="message bot">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    Hi! I'm FitBot, your AI fitness assistant. Ask me anything about workouts, nutrition, diet plans, or fitness tips! 💪
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-suggestions">
+            <div class="quick-suggestion" onclick="sendQuickMessage('Best exercises for weight loss?')">Weight Loss Tips</div>
+            <div class="quick-suggestion" onclick="sendQuickMessage('How to build muscle?')">Muscle Building</div>
+            <div class="quick-suggestion" onclick="sendQuickMessage('Healthy meal plan ideas?')">Meal Plans</div>
+            <div class="quick-suggestion" onclick="sendQuickMessage('Post-workout nutrition?')">Post-Workout</div>
+        </div>
+
+        <div class="fitbot-input">
+            <input type="text" id="fitbotInput" placeholder="Type your message..." />
+            <button class="voice-btn" id="voiceBtn" title="Voice Input" aria-label="Voice Input">
+                <i class="fas fa-microphone" style="pointer-events: none;"></i>
+            </button>
+            <button id="sendBtn" title="Send Message" aria-label="Send Message">
+                <i class="fas fa-paper-plane" style="pointer-events: none;"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FitBot Functionality
+    const fitbotToggle = document.getElementById('fitbotToggle');
+    const fitbotWindow = document.getElementById('fitbotWindow');
+    const fitbotMessages = document.getElementById('fitbotMessages');
+    const fitbotInput = document.getElementById('fitbotInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const voiceBtn = document.getElementById('voiceBtn');
+
+    let isRecording = false;
+    let recognition = null;
+
+    // Toggle chatbot window
+    fitbotToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        fitbotWindow.classList.toggle('active');
+        if (fitbotWindow.classList.contains('active')) {
+            fitbotInput.focus();
+        }
+    });
+
+    // Send message
+    function sendMessage() {
+        const message = fitbotInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, 'user');
+        fitbotInput.value = '';
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        // Get AI response
+        setTimeout(() => {
+            getAIResponse(message);
+        }, 1000);
+    }
+
+    // Add message to chat
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = sender === 'bot' ? '🤖' : '👤';
+        
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.textContent = text;
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(content);
+        
+        const typingIndicator = document.querySelector('.typing-indicator');
+        if (typingIndicator) {
+            fitbotMessages.removeChild(typingIndicator);
+        }
+        
+        fitbotMessages.appendChild(messageDiv);
+        fitbotMessages.scrollTop = fitbotMessages.scrollHeight;
+    }
+
+    // Show typing indicator
+    function showTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator active';
+        indicator.innerHTML = '<span></span><span></span><span></span>';
+        fitbotMessages.appendChild(indicator);
+        fitbotMessages.scrollTop = fitbotMessages.scrollHeight;
+    }
+
+    // Get AI response (using Gemini API)
+    async function getAIResponse(userMessage) {
+        try {
+            const response = await fetch('/chatbot-response/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            const data = await response.json();
+            
+            if (data.response) {
+                addMessage(data.response, 'bot');
+            } else {
+                addMessage("I'm having trouble connecting right now. Please try again later!", 'bot');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage("Sorry, I encountered an error. Please try again!", 'bot');
+        }
+    }
+
+    // Quick message suggestions
+    function sendQuickMessage(message) {
+        fitbotInput.value = message;
+        sendMessage();
+    }
+
+    // Event listeners
+    sendBtn.addEventListener('click', sendMessage);
+    fitbotInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Voice recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = function() {
+            isRecording = true;
+            voiceBtn.classList.add('recording');
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            fitbotInput.value = transcript;
+            sendMessage();
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            isRecording = false;
+            voiceBtn.classList.remove('recording');
+        };
+
+        recognition.onend = function() {
+            isRecording = false;
+            voiceBtn.classList.remove('recording');
+        };
+
+        voiceBtn.addEventListener('click', function() {
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+    } else {
+        voiceBtn.style.display = 'none';
+    }
+
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>

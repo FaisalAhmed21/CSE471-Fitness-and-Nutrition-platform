@@ -89,6 +89,9 @@ urlpatterns = [
     path('workout/legs/advanced/', views.legs_advanced, name='legs_advanced'),
 
     path('tracker/', views.tracker, name='tracker'),
+    
+    # Chatbot endpoint
+    path('chatbot-response/', views.chatbot_response, name='chatbot_response'),
 
 ] 
 

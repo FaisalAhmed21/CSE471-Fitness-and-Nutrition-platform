@@ -218,7 +218,10 @@ EMAIL_HOST_PASSWORD = 'hhvqufjnzwkkboxn'
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = 'buddiesfit50@gmail.com'
 
-STRIPE_SECRET_KEY = 'YOUR_STRIPE_SECRET_KEY'
-STRIPE_PUBLISHABLE_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY'
+STRIPE_SECRET_KEY = 'Your_Stripe_Secret_Key'  # Get your Stripe Secret Key from https://dashboard.stripe.com/apikeys
+STRIPE_PUBLISHABLE_KEY = 'Your_Stripe_Publishable_Key'  # Get your Stripe Publishable Key from https://dashboard.stripe.com/apikeys
 STRIPE_PUBLIC_KEY = STRIPE_PUBLISHABLE_KEY  # Alias for templates
 DOMAIN_URL = 'http://127.0.0.1:8000'  # No trailing slash
+
+# Google Gemini API Key for Chatbot
+GEMINI_API_KEY = 'Your_Gemini_API_Key'  # Get free API key from https://makersuite.google.com/app/apikey

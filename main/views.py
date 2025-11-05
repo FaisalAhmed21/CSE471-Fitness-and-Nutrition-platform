@@ -23,6 +23,8 @@ from django.http import JsonResponse
 from django.db.models import Q
 import stripe
 from functools import wraps
+import json
+import requests
 
 
 def subscription_required(view_func):
@@ -1417,3 +1419,79 @@ def success_view(request):
 def cancel_view(request):
     """Legacy cancel view - redirect to payment cancelled"""
     return redirect('payment_cancelled')
+
+
+@require_POST
+def chatbot_response(request):
+    """
+    Handle chatbot messages and return AI responses using Google Gemini
+    """
+    try:
+        data = json.loads(request.body)
+        user_message = data.get('message', '').strip()
+        
+        if not user_message:
+            return JsonResponse({'error': 'No message provided'}, status=400)
+        
+        # Check if API key is configured
+        if not hasattr(settings, 'GEMINI_API_KEY') or settings.GEMINI_API_KEY == 'your_gemini_api_key_here':
+            print("Gemini API key not configured")
+            return JsonResponse({
+                'response': "FitBot needs to be configured with a Gemini API key. Please contact the administrator. Meanwhile, I can still chat! What's your fitness question? 💪"
+            })
+        
+        # Use REST API directly instead of SDK
+        import requests as req
+        
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={settings.GEMINI_API_KEY}"
+        
+        # Create fitness-focused prompt
+        fitness_prompt = f"""You are FitBot, an expert AI fitness and nutrition assistant. 
+        You help users with workout plans, nutrition advice, diet recommendations, exercise techniques, 
+        weight loss/gain strategies, muscle building, and general fitness guidance.
+        
+        Keep responses concise (2-3 sentences max), friendly, and motivational.
+        Always encourage healthy habits and remind users to consult professionals for medical concerns.
+        
+        User question: {user_message}
+        
+        Provide a helpful, encouraging response:"""
+        
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": fitness_prompt
+                }]
+            }]
+        }
+        
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        
+        # Get AI response
+        print(f"Sending to Gemini: {user_message}")
+        response = req.post(api_url, json=payload, headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            ai_response = result['candidates'][0]['content']['parts'][0]['text']
+            print(f"Gemini response: {ai_response}")
+            return JsonResponse({'response': ai_response})
+        else:
+            print(f"API Error: {response.status_code} - {response.text}")
+            return JsonResponse({
+                'response': "I'm having trouble connecting to my AI brain right now. Try asking: 'What exercises help lose weight?' or 'Best protein sources?' 💪"
+            })
+        
+    except Exception as e:
+        error_message = str(e)
+        print(f"Chatbot error: {error_message}")
+        print(f"Error type: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
+        
+        # Return a more informative error message
+        return JsonResponse({
+            'response': "I encountered a technical issue. But I'm still here! Ask me about workouts, nutrition, or fitness tips! 💪"
+        })

@@ -40,19 +40,22 @@ pip install PyJWT
 pip install cryptography
 pip install pillow
 pip install stripe
+pip install google-generativeai
 ```
 
-## Important: Stripe API Configuration (Required for Payment Features)
+## Important: API Configuration
+
+### Stripe API Configuration (Required for Payment Features)
 
 After downloading the project, you **MUST** configure your Stripe API keys to enable payment features:
 
-### Step 1: Get Your Stripe API Keys
+**Step 1: Get Your Stripe API Keys**
 1. Create a free account at [https://stripe.com](https://stripe.com)
 2. Go to Stripe Dashboard → Developers → API Keys
 3. Copy your **Publishable Key** (starts with `pk_test_...`)
 4. Copy your **Secret Key** (starts with `sk_test_...`)
 
-### Step 2: Update the Configuration File
+**Step 2: Update the Configuration File**
 1. Open the file: `hello/settings.py`
 2. Find these lines (around line 160-165):
    ```python
@@ -62,8 +65,27 @@ After downloading the project, you **MUST** configure your Stripe API keys to en
 3. Replace `'your_stripe_publishable_key_here'` with your actual Publishable Key
 4. Replace `'your_stripe_secret_key_here'` with your actual Secret Key
 
-
 **Note:** Without configuring Stripe API keys, the Stripe payment option will not work. bKash sandbox mode will work without any configuration.
+
+### Google Gemini API Configuration (Required for AI Chatbot)
+
+To enable the FitBot AI chatbot feature, you need a free Google Gemini API key:
+
+**Step 1: Get Your Gemini API Key**
+1. Visit [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API Key"
+4. Copy the generated API key
+
+**Step 2: Update the Configuration File**
+1. Open the file: `hello/settings.py`
+2. Find this line (around line 230):
+   ```python
+   GEMINI_API_KEY = 'your_gemini_api_key_here'
+   ```
+3. Replace `'your_gemini_api_key_here'` with your actual API key
+
+**Note:** Without configuring the Gemini API key, the chatbot will show a fallback response. The API is free with generous limits.
 
 ## Login Info:
 
@@ -99,13 +121,19 @@ After downloading the project, you **MUST** configure your Stripe API keys to en
 - Delete Profile using the actual password
 
 ### Module 2:
+### Module 2:
 - Notification reminder
 - BMI page
 - Exercise video tutorial play
 - Nutrition values
 - Support and FAQs
-- Post, view, and reply to discussions in community discussion forum
-- One-time upvote and unique view tracking per user in community discussion forum
+- Community Discussion Forum
+  - Post, view, and reply to discussions
+  - One-time upvote and unique view tracking per user
+- **AI-Powered FitBot Chatbot**
+  - Real-time fitness and nutrition guidance
+  - Voice input support with speech recognition
+  - Powered by Google Gemini AI
 
 ### Module 3:
 - Subscription management and renewal
@@ -119,7 +147,7 @@ After downloading the project, you **MUST** configure your Stripe API keys to en
 ### bKash Test Credentials:
 - **Phone Number:** Any valid 11-digit number starting with 01 (e.g., 01712345678)
 - **PIN:** Any 5-digit number (e.g., 12345)
-- **OTP:** Any 6-digit number or use the auto-generated OTP shown on screen
+- **OTP:** Use the 6-digit auto-generated OTP shown on screen
 - **Note:** No real money is charged in sandbox mode
 
 ### Stripe:
