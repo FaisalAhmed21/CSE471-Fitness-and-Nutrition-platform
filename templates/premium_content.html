@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Content</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+    body {
+      background-color: #f0e6d2;
+      font-family: "Roboto", sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      padding-top: 60px;
+    }
+
+    .heading {
+      font-size: 3rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: bold;
+      background: linear-gradient(90deg, #ff7e5f, #feb47b, #6abf69, #58a958);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .card-button {
+      display: block;
+      width: 90%;
+      max-width: 600px;
+      text-decoration: none;
+      color: white;
+      padding: 40px;
+      border-radius: 16px;
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-button.workout {
+      background: linear-gradient(135deg, #34a853, #81c784);
+    }
+
+    .card-button.diet {
+      background: linear-gradient(135deg, #fb8c00, #fdd835);
+    }
+
+    .card-button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="heading">Welcome to Premium Contents</h1>
+
+    <a href="/client-wplan-view/" class="card-button workout">Workout</a>
+    <a href="/client-plan-view/" class="card-button diet">Diet Plans</a>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

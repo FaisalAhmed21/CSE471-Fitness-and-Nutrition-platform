@@ -1,0 +1,192 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Options</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('{% static "login/images/fitlife.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            background-color: #343a40; /* Dark background */
+            padding: 10px 20px;
+        }
+
+        .navbar .navbar-nav .nav-link {
+            color: white;
+            font-size: 18px;
+            margin-right: 20px;
+        }
+
+        .navbar .nav-right {
+            margin-left: auto;
+            margin-right: 80px; /* Move the logout button slightly to the right */
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 80%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-top: 200px; /* Added padding to move the container down */
+        }
+
+        .option {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        #arms-option {
+            background-image: url('{% static "login/images/arms.jpg" %}');
+        }
+
+        #chest-option {
+            background-image: url('{% static "login/images/chest.jpg" %}');
+        }
+
+        #abs-option {
+            background-image: url('{% static "login/images/abs.jpg" %}');
+        }
+
+        #legs-option {
+            background-image: url('{% static "login/images/legs.jpg" %}');
+        }
+
+        .option-content {
+            background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            width: 100%;
+        }
+
+        .option-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .sub-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sub-options a {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .sub-options a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="navbar-nav">
+            <a href="/client-profile/" class="nav-link">Profile</a>
+            <a href="/client-wplan-view/" class="nav-link">Workouts</a>
+            <a href="/client-plan-view/" class="nav-link">Diet Plans</a>
+            <a href="/bmi/" class="nav-link">BMI</a>
+            <a href="/workout/" class="nav-link">Tutorials</a>
+            <a href="/tracker/" class="nav-link">Nutrients</a>
+            <a href="/discussion-client-view/" class="nav-link">Discussion Forum</a>
+            <a href="/support&faq/" class="nav-link">Support and FAQ's</a>
+        </div>
+        <div class="nav-right">
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="option" id="arms-option">
+            <div class="option-content">
+                <div class="option-title">Arms</div>
+                <div class="sub-options">
+                    <a href="{% url 'arms_beginner' %}">Beginner</a>
+                    <a href="{% url 'arms_intermediate' %}">Intermediate</a>
+                    <a href="{% url 'arms_advanced' %}">Advanced</a>
+                </div>
+            </div>
+        </div>
+        <div class="option" id="chest-option">
+            <div class="option-content">
+                <div class="option-title">Chest</div>
+                <div class="sub-options">
+                    <a href="{% url 'chest_beginner' %}">Beginner</a>
+                    <a href="{% url 'chest_intermediate' %}">Intermediate</a>
+                    <a href="{% url 'chest_advanced' %}">Advanced</a>
+                </div>
+            </div>
+        </div>
+        <div class="option" id="abs-option">
+            <div class="option-content">
+                <div class="option-title">Abs</div>
+                <div class="sub-options">
+                    <a href="{% url 'abs_beginner' %}">Beginner</a>
+                    <a href="{% url 'abs_intermediate' %}">Intermediate</a>
+                    <a href="{% url 'abs_advanced' %}">Advanced</a>
+                </div>
+            </div>
+        </div>
+        <div class="option" id="legs-option">
+            <div class="option-content">
+                <div class="option-title">Legs</div>
+                <div class="sub-options">
+                    <a href="{% url 'legs_beginner' %}">Beginner</a>
+                    <a href="{% url 'legs_intermediate' %}">Intermediate</a>
+                    <a href="{% url 'legs_advanced' %}">Advanced</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

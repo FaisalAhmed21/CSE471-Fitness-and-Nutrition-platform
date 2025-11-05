@@ -1,0 +1,151 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Edit Profile</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url("{% static 'login/images/edit_profile.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .form-v7-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            padding: 80px;
+            margin: auto;
+            max-width: 500px;
+            margin-top: 50px;
+            margin-left: 0; /* Align to the left */
+        }
+        
+        .container {
+            display: flex;
+            justify-content: flex-start; /* Aligns the content to the left */
+            align-items: flex-start;
+            height: 100vh;
+            padding-left: 50px; /* Add some padding from the left edge if needed */
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+        }
+
+        .form-row label {
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-row-last {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="form-v7">
+    <div class="container">
+        <div class="page-content">
+            <div class="form-v7-content">
+                <h2 class="text-center mb-4">Edit Profile</h2>
+                <form class="form-detail" method="POST">
+                    {% csrf_token %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <div class="form-row">
+                        <label for="clientusrname">Username:</label>
+                        <input type="text" id="clientusrname" name="clientusrname" class="form-control" value="{{ client.client_usrname }}" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="first_name">First Name:</label>
+                        <input type="text" id="first_name" name="first_name" class="form-control" value="{{ client.first_name }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="last_name">Last Name:</label>
+                        <input type="text" id="last_name" name="last_name" class="form-control" value="{{ client.last_name }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" class="form-control" value="{{ client.email }}" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="phone">Phone:</label>
+                        <input type="text" id="phone" name="phone" class="form-control" value="{{ client.phone }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="age">Age:</label>
+                        <input type="text" id="age" name="age" class="form-control" value="{{ client.age }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="weight">Weight:</label>
+                        <input type="text" id="weight" name="weight" class="form-control" value="{{ client.weight }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="height">Height:</label>
+                        <input type="text" id="height" name="height" class="form-control" value="{{ client.height }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="bio">Bio:</label>
+                        <textarea id="bio" name="bio" class="form-control">{{ client.bio }}</textarea>
+                    </div>
+                    <div class="form-row">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender" class="form-control">
+                            <option value="" disabled selected>Choose option</option>
+                            <option value="Male" {% if client.gender == "Male" %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if client.gender == "Female" %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="achievement">Achievement:</label>
+                        <input type="text" id="achievement" name="achievement" class="form-control" value="{{ client.achievement }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="personalTrainer">Personal Trainer:</label>
+                        <input type="text" id="personalTrainer" name="personalTrainer" class="form-control" value="{{ client.personalTrainer }}">
+                    </div>
+                    <div class="form-row-last">
+                        <button type="submit" class="btn btn-primary btn-block">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+    <script>
+        // Form validation setup
+        $(".form-detail").validate({
+            rules: {
+                email: {
+                    required: true,
+                    email: true
+                },
+                clientusrname: "required",
+            },
+            messages: {
+                email: {
+                    required: "Please provide an email",
+                    email: "Please enter a valid email address"
+                },
+                clientusrname: {
+                    required: "Please provide a username",
+                },
+            }
+        });
+    </script>
+</body>
+
+</html>

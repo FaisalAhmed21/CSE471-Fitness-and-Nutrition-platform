@@ -1,0 +1,138 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Plan Content</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url("{% static 'login/images/fitness.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            padding-top: 70px;
+        }
+
+        .form-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: auto;
+            max-width: 600px;
+        }
+
+        .card {
+            margin: 0 auto; /* Center the card */
+        }
+
+        .countdown-img {
+            max-width: 300px; /* Adjust size as needed */
+            max-height: 500px; /* Adjust size as needed */
+            object-fit: contain; /* Maintain aspect ratio */
+        }
+
+        .workout-img {
+            max-width: 300px; /* Adjust size as needed */
+            max-height: 500px; /* Adjust size as needed */
+            object-fit: contain; /* Maintain aspect ratio */
+        }
+
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Trainer Dashboard</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a href="/trainer-profile/" class="nav-link">Profile</a></li>
+                    <li class="nav-item"><a href="/add-wplan-content/{{wplan_id}}/" class="nav-link">Add Workout Contents</a></li>
+                    
+                </ul>
+            </div>
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- Content Section with Container -->
+    <div class="container">
+        {% for content in wcontent %}
+        <section class="Body">
+            {% if content.wplan_id.wplan_id == wplan_id %}
+            <div class="card" style="max-width: 42rem;">
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <a href="#"></a> <!-- Update href if needed -->
+                        <div>
+                            <a href="#" class="text-dark mb-0">
+                                <strong>Trainer: {{ content.wupload_by }}</strong>
+                            </a>
+                            <a href="#" class="text-muted d-block" style="margin-top: -6px;">
+                                <small>{{ content.wdatetime }}</small>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-tag"><p>{{ content.wplan_content_tag }}</p></i>
+                        <small>{{ content.wplan_content_description }}</small>
+                    </div>
+                </div>
+
+                <p class="d-inline-flex gap-1">
+                    <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample{{ forloop.counter }}">
+                        START
+                    </a>
+                </p>
+                
+                <div class="collapse" id="collapseExample{{ forloop.counter }}">
+                    <div class="card card-body">
+                        <div class="text-center mt-3">
+                            {% if content.wcontent_count %}
+                            <img src="{{ content.wcontent_count.url }}" class="img-fluid countdown-img" alt="Countdown GIF" />
+                            {% endif %}
+                        </div>
+                        <div class="text-center mt-3">
+                            {% if content.wcontent_img %}
+                            <img src="{{ content.wcontent_img.url }}" class="img-fluid workout-img" alt="Workout Image" />
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <a href="#">
+                                <i class="fas fa-thumbs-up text-primary"></i>
+                                <i class="fas fa-heart text-danger"></i>
+                                <span></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

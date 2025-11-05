@@ -1,0 +1,175 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Client Profile</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url("{% static 'login/images/fitness.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            padding-top: 70px; /* Adjust padding for fixed navbar */
+            overflow: hidden; /* Disable window scroll */
+        }
+
+        .navbar {
+            margin-bottom: 20px; /* Add some space below the navbar */
+        }
+
+        .form-v7-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: auto;
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+        }
+
+        .form-row label {
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-row-last {
+            text-align: center;
+        }
+
+        .card {
+            border-radius: 15px;
+            max-height: 600px; /* Set a max height for the card */
+            overflow-y: auto;
+            padding-bottom: 50px; /* Make it scrollable */
+            position: relative; /* Ensure this is set */
+        }
+
+        .message-container {
+            position: fixed;
+            top: 70px; /* Adjust based on your navbar height */
+            right: 20px;
+            z-index: 1000;
+            width: 300px; /* Adjust the width as needed */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark fixed-top" id="ftco-navbar">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+                aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fa fa-bars"></span> Menu
+            </button>
+
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active"><a href="/owner-profile/" class="nav-link">Profile</a></li>
+                    <li class="nav-item"><a href="custom_message/" class="nav-link">Custom Message</a></li>
+                    <!-- <li class="nav-item"><a href="" class="nav-link">Diet Plans</a></li> -->
+                    <li class="nav-item"><a href="/bmi/" class="nav-link">BMI</a></li>
+                    <li class="nav-item"><a href="/workout/" class="nav-link">Tutorials</a></li>
+                    <li class="nav-item"><a href="/tracker/" class="nav-link">Nutrients</a></li>
+                    <!-- <li class="nav-item"><a href="/discussion-client-view/" class="nav-link">Discussion Forum</a></li> -->
+                    <li class="nav-item"><a href="/support&faq/" class="nav-link">Support and FAQ's</a></li>
+                </ul>
+            </div>
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                Logout
+            </button>
+        </div>
+    </nav>
+
+    <section>
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-md-12 col-xl-8">
+                    <div class="card">
+                        <!-- Message block inside the card -->
+                        {% if messages %}
+                        <div class="message-container">
+                            {% for message in messages %}
+                            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body text-center">
+                            <div class="mt-3 mb-4">
+                                {% if user.gender == "Male" %}
+                                <img src="{% static 'login/images/boys_avatar.png' %}" class="rounded-circle img-fluid" style="width: 100px;" />
+                                {% elif user.gender == "Female" %}
+                                <img src="{% static 'login/images/girls_avatar.jpg' %}" class="rounded-circle img-fluid" style="width: 100px;" />
+                                {% else %}
+                                <img src="{% static 'login/images/no_gender.png' %}" class="rounded-circle img-fluid" style="width: 100px;" />
+                                {% endif %}
+                            </div>
+                            <p class="text-muted mb-4">###{{user.email }}###</p>
+                            <h4 class="mb-2">{{ user.first_name }} {{ user.last_name }}</h4>
+
+                            <div class="text-left">
+                                <p><strong>Email:</strong> {{ user.email }}</p>
+                                <p><strong>Phone:</strong> {{ user.phone }}</p>
+                                <p><strong>Age:</strong> {{ user.age }}</p>
+                                <p><strong>Weight:</strong> {{ user.weight }}</p>
+                                <p><strong>Height:</strong> {{ user.height }}</p>
+                                <p><strong>Bio:</strong> {{ user.bio }}</p>
+                                <p><strong>Gender:</strong> {{ user.gender }}</p>
+                                <!-- <p><strong>Achievement:</strong> {{ user.achievement }}</p>
+                                <p><strong>Personal Trainer:</strong> {{ user.personalTrainer }}</p> -->
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <a href="/edit-profile/" class="btn btn-primary" id="edit-profile-btn">Edit Account</a>
+                            </div>
+
+                            <!-- <div class="text-center mt-4">
+                                <button class="btn btn-danger" id="delete-account-btn">Delete Account</button>
+                            </div> -->
+
+                            <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Account Deletion</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                                            <!-- Error message for invalid password -->
+                                            <div id="password-error-msg" class="alert alert-danger d-none" role="alert"></div>
+                                            <!-- Password input -->
+                                            <input type="password" id="delete-account-password" class="form-control mt-3" placeholder="Enter your password">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" id="cancel-delete-btn" data-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <form id="delete-account-form" action="{% url 'delete_account' %}" method="POST" style="display: none;">
+                                {% csrf_token %}
+                                <input type="hidden" name="password" id="password-field">
+                            </form> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+</body>
+</html>

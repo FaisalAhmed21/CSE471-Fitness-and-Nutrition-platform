@@ -1,0 +1,568 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ discussion.title }} - FitLife Forum</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            padding-top: 80px;
+            padding-bottom: 50px;
+        }
+
+        .navbar-dark {
+            background: rgba(0, 0, 0, 0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .discussion-container {
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .back-button {
+            background: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            color: #667eea;
+        }
+
+        .discussion-main {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .discussion-header {
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .tag-badge {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .tag-nutrition {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tag-workout {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .tag-weightloss {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .tag-muscle {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tag-general {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .tag-supplement {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-badge {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .discussion-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 20px 0;
+            line-height: 1.4;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .author-details h6 {
+            margin: 0;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .author-details small {
+            color: #6c757d;
+        }
+
+        .discussion-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #495057;
+            margin: 25px 0;
+        }
+
+        .discussion-stats {
+            display: flex;
+            gap: 25px;
+            padding: 20px 0;
+            border-top: 2px solid #f8f9fa;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+        }
+
+        .stat-item i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-action {
+            padding: 10px 25px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-upvote {
+            background: #e7f3ff;
+            color: #667eea;
+        }
+
+        .btn-upvote:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-upvote.upvoted {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ffe7e7;
+            color: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .replies-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reply-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .reply-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .reply-card.solution {
+            border: 2px solid #28a745;
+            background: #f0fff4;
+        }
+
+        .solution-badge {
+            background: #28a745;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .trainer-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .reply-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .reply-content {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #495057;
+            margin: 15px 0;
+        }
+
+        .reply-form {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            margin-top: 30px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn-submit-reply {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit-reply:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .empty-replies {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-replies i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .discussion-title {
+                font-size: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/client-profile/">
+                <i class="fas fa-dumbbell"></i> FitLife
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a href="/client-profile/" class="nav-link">Profile</a></li>
+                    <li class="nav-item"><a href="/client-wplan-view/" class="nav-link">Workouts</a></li>
+                    <li class="nav-item"><a href="/client-plan-view/" class="nav-link">Diet Plans</a></li>
+                    <li class="nav-item"><a href="/bmi/" class="nav-link">BMI</a></li>
+                    <li class="nav-item"><a href="/workout/" class="nav-link">Tutorials</a></li>
+                    <li class="nav-item"><a href="/tracker/" class="nav-link">Nutrients</a></li>
+                    <li class="nav-item active"><a href="/discussion-client-view/" class="nav-link">Discussion Forum</a></li>
+                    <li class="nav-item"><a href="/support&faq/" class="nav-link">Support and FAQ's</a></li>
+                </ul>
+            </div>
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="discussion-container">
+            <a href="{% url 'discussionClientView' %}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Forum
+            </a>
+
+            <!-- Main Discussion -->
+            <div class="discussion-main">
+                <div class="discussion-header">
+                    <div>
+                        <span class="tag-badge tag-{{ discussion.tag|lower }}">
+                            <i class="fas fa-tag"></i> {{ discussion.tag }}
+                        </span>
+                        <span class="status-badge status-{{ discussion.status }}">
+                            {% if discussion.status == 'resolved' %}
+                                <i class="fas fa-check-circle"></i> Resolved
+                            {% elif discussion.status == 'rejected' %}
+                                <i class="fas fa-times-circle"></i> Rejected
+                            {% else %}
+                                <i class="fas fa-clock"></i> Pending
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <h1 class="discussion-title">{{ discussion.title }}</h1>
+
+                    <div class="author-info">
+                        <div class="author-avatar">
+                            {{ discussion.posted_by.first_name|first|upper }}{{ discussion.posted_by.last_name|first|upper }}
+                        </div>
+                        <div class="author-details">
+                            <h6>{{ discussion.posted_by.first_name }} {{ discussion.posted_by.last_name }}</h6>
+                            <small><i class="far fa-clock"></i> Posted {{ discussion.datetime|timesince }} ago</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="discussion-content">
+                    {{ discussion.statement|linebreaks }}
+                </div>
+
+                <div class="discussion-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-eye"></i>
+                        <span>{{ discussion.views_count }} views</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-comments"></i>
+                        <span>{{ replies|length }} replies</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>{{ discussion.upvotes }} upvotes</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="{% url 'upvoteDiscussion' discussion.dnumber %}" class="btn-action btn-upvote {% if has_upvoted %}upvoted{% endif %}">
+                        <i class="fas fa-thumbs-up"></i> {% if has_upvoted %}Upvoted{% else %}Upvote{% endif %}
+                    </a>
+                    {% if current_user == discussion.posted_by %}
+                    <button class="btn-action btn-delete" onclick="if(confirm('Are you sure you want to delete this discussion?')) window.location.href='{% url 'deleteDiscussion' discussion.dnumber %}'">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Replies Section -->
+            <div class="replies-section">
+                <h2 class="section-title">
+                    <i class="fas fa-comments"></i> Replies ({{ replies|length }})
+                </h2>
+
+                {% if replies %}
+                    {% for reply in replies %}
+                    <div class="reply-card {% if reply.is_solution %}solution{% endif %}">
+                        {% if reply.is_solution %}
+                        <div class="solution-badge">
+                            <i class="fas fa-check-circle"></i> Accepted Solution
+                        </div>
+                        {% endif %}
+
+                        <div class="reply-header">
+                            <div class="author-info">
+                                <div class="author-avatar">
+                                    {% if reply.replied_by_client %}
+                                        {{ reply.replied_by_client.first_name|first|upper }}{{ reply.replied_by_client.last_name|first|upper }}
+                                    {% else %}
+                                        {{ reply.replied_by_trainer.first_name|first|upper }}{{ reply.replied_by_trainer.last_name|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="author-details">
+                                    <h6>
+                                        {% if reply.replied_by_client %}
+                                            {{ reply.replied_by_client.first_name }} {{ reply.replied_by_client.last_name }}
+                                        {% else %}
+                                            {{ reply.replied_by_trainer.first_name }} {{ reply.replied_by_trainer.last_name }}
+                                            <span class="trainer-badge"><i class="fas fa-star"></i> Trainer</span>
+                                        {% endif %}
+                                    </h6>
+                                    <small><i class="far fa-clock"></i> {{ reply.datetime|timesince }} ago</small>
+                                </div>
+                            </div>
+                            {% if current_user == discussion.posted_by and not reply.is_solution and discussion.status != 'resolved' %}
+                            <form method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="reply_id" value="{{ reply.id }}">
+                                <input type="hidden" name="mark_as_solution" value="true">
+                                <button type="submit" class="btn btn-sm btn-success" style="border-radius: 20px;">
+                                    <i class="fas fa-check"></i> Mark as Solution
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+
+                        <div class="reply-content">
+                            {{ reply.reply_text|linebreaks }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-replies">
+                        <i class="far fa-comment-dots"></i>
+                        <h5>No replies yet</h5>
+                        <p>Be the first to share your thoughts!</p>
+                    </div>
+                {% endif %}
+
+                <!-- Reply Form -->
+                <div class="reply-form">
+                    <h4 class="section-title">
+                        <i class="fas fa-reply"></i> Post Your Reply
+                    </h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="reply_text">Your Response</label>
+                            <textarea class="form-control" 
+                                      name="reply_text" 
+                                      id="reply_text"
+                                      placeholder="Share your knowledge, experience, or ask follow-up questions..." 
+                                      required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit-reply">
+                            <i class="fas fa-paper-plane"></i> Post Reply
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

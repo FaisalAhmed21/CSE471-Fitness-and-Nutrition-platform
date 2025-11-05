@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Reset some default styles */
+        body, h1, h2, p, form {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Apply a modern font and basic layout */
+        body {
+            font-family: Arial, sans-serif;
+            background: url("{% static 'login/images/BMI.png' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .navbar {
+            position: fixed; /* Fix navbar at the top */
+            top: 0;
+            left: 0;
+            width: 100%; /* Make navbar full width */
+            background-color: #333;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between; /* Space between links and logout */
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+            z-index: 1000; /* Ensure navbar is above other elements */
+        }
+
+        .navbar a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .navbar .nav-left {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar .nav-right {
+            display: flex;
+            gap: 10px;
+            padding-right: 200px; /* Adjust this value to move the button left */
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 80px; /* Adjust to account for fixed navbar */
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: #007bff;
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        form input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        form button {
+            padding: 10px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 30%;
+            align-self: center;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            display: none;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        canvas {
+            width: 100% !important;
+            height: 500px !important;
+        }
+
+        .comment {
+            font-size: 54px;
+        }
+
+        .comment.underweight {
+            color: yellow;
+        }
+
+        .comment.good {
+            color: green;
+        }
+
+        .comment.overweight {
+            color: red;
+        }
+
+        .comment.obese {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-left">
+            <a href="/client-profile/" class="nav-link">Profile</a>
+            <a href="/client-wplan-view/" class="nav-link">Workouts</a>
+            <a href="/client-plan-view/" class="nav-link">Diet Plans</a>
+            <a href="/bmi/" class="nav-link">BMI</a>
+            <a href="/workout/" class="nav-link">Tutorials</a>
+            <a href="/tracker/" class="nav-link">Nutrients</a>
+            <a href="/discussion-client-view/" class="nav-link">Discussion Forum</a>
+            <a href="/support&faq/" class="nav-link">Support and FAQ's</a>
+        </div>
+        <div class="nav-right">
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                Logout
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1>BMI Calculator</h1>
+        
+        <form id="bmi-form" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="hidden" id="height-input" name="height" value="{{ height }}">
+            <input type="hidden" id="weight-input" name="weight" value="{{ weight }}">
+            <button type="submit">Calculate BMI</button>
+        </form>
+    
+        {% if latest_bmi %}
+        <h2>Your BMI: {{ latest_bmi.bmi_value }}</h2>
+        <p class="comment {{ latest_bmi.comment|lower }}">{{ latest_bmi.comment }}</p>
+        
+        <div class="chart-container">
+            <canvas id="bmiChart"></canvas>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            var ctx = document.getElementById('bmiChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [{% for record in bmi_records %}"{{ record.recorded_at|date:'d M Y' }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+                    datasets: [{
+                        label: 'BMI Over Time',
+                        data: [{% for record in bmi_records %}{{ record.bmi_value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                        borderColor: 'orange',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'BMI'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+        {% endif %}
+    </div>
+    
+</body>
+</html>

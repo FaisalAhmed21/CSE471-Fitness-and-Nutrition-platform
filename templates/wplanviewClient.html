@@ -1,0 +1,108 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Trainer Plans</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url("{% static 'login/images/fitness.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            padding-top: 70px; /* Adjust padding for fixed navbar */
+        }
+
+        .navbar {
+            margin-bottom: 20px; /* Add some space below the navbar */
+        }
+
+        .form-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: auto;
+            max-width: 1200px; /* Adjust max-width as needed */
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .message-container {
+            position: fixed;
+            top: 70px; /* Adjust based on your navbar height */
+            right: 20px;
+            z-index: 1000;
+            width: 300px; /* Adjust the width as needed */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Client Dashboard</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a href="/client-profile/" class="nav-link">Profile</a></li>
+                    <li class="nav-item"><a href="/client-wplan-view/" class="nav-link">Workouts</a></li>
+                    <li class="nav-item"><a href="/client-plan-view/" class="nav-link">Diet Plans</a></li>
+                    <li class="nav-item"><a href="/bmi/" class="nav-link">BMI</a></li>
+                    <li class="nav-item"><a href="/workout/" class="nav-link">Tutorials</a></li>
+                    <li class="nav-item"><a href="/tracker/" class="nav-link">Nutrients</a></li>
+                    <li class="nav-item"><a href="/discussion-client-view/" class="nav-link">Discussion Forum</a></li>
+                    <li class="nav-item"><a href="/support&faq/" class="nav-link">Support and FAQ's</a></li>
+                </ul>
+            </div>
+            
+            <!-- Logout form should be separate -->
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                Logout
+            </button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="form-content mt-5">
+            <h2 class="text-center mb-4">Workout Plans</h2>
+            <div class="row">
+                {% for plan in wplanviewClient %}
+                <div class="col-md-6 mb-4">
+                    <div class="card" style="width: 100%;">
+                        {% if plan.wplan_image %}
+                        <img src="{{ plan.wplan_image.url }}" class="card-img-top" alt="{{ plan.wplan_name }} Image">
+                        {% else %}
+                        <img src="{% static 'login/images/default.jpg' %}" class="card-img-top" alt="Default Image">  <!-- Fallback image -->
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ plan.wplan_name }}</h5>
+                            <p class="card-text">{{ plan.wplan_description }}</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Points: {{ plan.wplan_point }}</li>
+                            <li class="list-group-item">Trainer: {{ plan.wplan_trainer }}</li>
+                            <li class="list-group-item">Topic: {{ plan.wplan_topic }}</li>
+                        </ul>
+                        <div class="card-body">
+                            <!-- Ensure that "Go" button is separate from the logout form -->
+                            <a href="/client-wplan-content/{{ plan.wplan_id }}/" class="btn btn-success btn-sm">Go</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+</body>
+</html>

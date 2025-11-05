@@ -1,0 +1,144 @@
+{% load static %}
+{% load socialaccount %}
+{% block content %}
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Login Trainer</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url("{% static 'login/images/pink-orange-liquid-blur-gradient-background-free-photo.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+    }
+    /* .bg-custom-1 {
+      background-color: #f0e68c; 
+    }
+    .bg-custom-2 {
+      background-color: #e6e6fa; 
+    }
+    .bg-custom-3 {
+      background-color: #ffdab9; 
+    }
+    .bg-custom-4 {
+      background-color: #ffe4e1; 
+    } */
+    .google-signin-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .btn-google {
+      display: flex;
+      align-items: center;
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #dddddd;
+      border-radius: 4px;
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    
+    .btn-google:hover {
+      background-color: #f8f8f8;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .google-logo {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+    .full-height {
+      height: 100vh;
+    }
+    .form-content {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+    .form-row {
+      margin-bottom: 20px;
+    }
+    .form-row label {
+      margin-bottom: 10px;
+      display: block;
+    }
+    .form-row-last {
+      text-align: center;
+    
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <div class="container full-height d-flex align-items-center justify-content-center">
+      <div class="row w-100">
+        <div class="col-md-6 d-flex align-items-center">
+          <img src="{% static 'login/images/21118412_6428209.svg' %}" alt="Image" class="img-fluid">
+        </div>
+        <div class="col-md-6">
+          <div class="form-content">
+            <div class="text-center mb-4">
+              <h3>Fitness and Nutrition Platform</h3>
+              <p class="text-muted">Trainer Login</p>
+            </div>
+            <form action="#" method="post">
+              {% csrf_token %}
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+              <div class="form-row">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username">
+              </div>
+              <div class="form-row">
+                <label for="password">Password</label>
+                <input type="password" name="password" class="form-control" id="password">
+              </div>
+              <div class="form-row-last">
+                <input type="submit" value="Log In" class="btn btn-primary btn-block">
+              </div>
+              <div class="google-signin-container text-center my-4">
+                <a href="{% provider_login_url 'google' %}?next={% url 'trainerProfile' %}" class="btn btn-google">
+                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="google-logo">
+                    Sign in with Google
+                </a>
+            </div>
+            <div class="google-signin-container text-center my-4">
+              <a href="{% provider_login_url 'github' %}?next={% url 'trainerProfile' %}" class="btn btn-google">
+                  <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub logo" class="google-logo">
+                  Sign in with GitHub
+              </a>
+          </div>
+            
+            </form>
+            <div class="text-center mt-4">
+              <!-- <span class="text-muted">Do not have an account? <a href="/trainer-register/">Create an account!</a></span> -->
+              <span class="d-block text-center my-4 text-muted"><a href="/password-reset/">Forget Password?</a></span>
+            </div>
+            <div class="text-center mt-4">
+              <span class="text-muted">Log in into other accounts:</span>
+              <br>
+              <a href="/client-login/">Client</a> or <a href="/owner-login/">Owner</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+{% endblock content %}

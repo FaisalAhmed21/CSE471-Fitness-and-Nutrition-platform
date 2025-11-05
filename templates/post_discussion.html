@@ -1,0 +1,389 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Post New Discussion - FitLife Forum</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+            padding-bottom: 50px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            margin: 30px auto;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .form-header h2 {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-control:focus {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        textarea.form-control {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .tag-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tag-option {
+            position: relative;
+        }
+
+        .tag-option input[type="radio"] {
+            display: none;
+        }
+
+        .tag-label {
+            display: block;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tag-option input[type="radio"]:checked + .tag-label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tag-label:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 14px 40px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 14px 40px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .icon-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-dark {
+            background: rgba(0, 0, 0, 0.9) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .char-counter {
+            text-align: right;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .guidelines {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .guidelines h6 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .guidelines ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #495057;
+        }
+
+        .guidelines li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/client-profile/">
+                <i class="fas fa-dumbbell"></i> FitLife
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a href="/client-profile/" class="nav-link">Profile</a></li>
+                    <li class="nav-item"><a href="/client-wplan-view/" class="nav-link">Workouts</a></li>
+                    <li class="nav-item"><a href="/client-plan-view/" class="nav-link">Diet Plans</a></li>
+                    <li class="nav-item"><a href="/bmi/" class="nav-link">BMI</a></li>
+                    <li class="nav-item"><a href="/workout/" class="nav-link">Tutorials</a></li>
+                    <li class="nav-item"><a href="/tracker/" class="nav-link">Nutrients</a></li>
+                    <li class="nav-item active"><a href="/discussion-client-view/" class="nav-link">Discussion Forum</a></li>
+                    <li class="nav-item"><a href="/support&faq/" class="nav-link">Support and FAQ's</a></li>
+                </ul>
+            </div>
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2><i class="fas fa-comments"></i> Start a New Discussion</h2>
+                <p>Share your questions, tips, or experiences with the community</p>
+            </div>
+
+            <div class="guidelines">
+                <h6><i class="fas fa-info-circle"></i> Guidelines</h6>
+                <ul>
+                    <li>Be respectful and constructive in your posts</li>
+                    <li>Choose an appropriate category for your discussion</li>
+                    <li>Provide clear and detailed information</li>
+                    <li>Search existing discussions before posting</li>
+                </ul>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="icon-label">
+                        <i class="fas fa-heading"></i> Discussion Title *
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="title" 
+                           id="title"
+                           placeholder="Enter a clear and concise title..." 
+                           required
+                           maxlength="200">
+                    <div class="char-counter">
+                        <span id="title-counter">0</span>/200 characters
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="icon-label">
+                        <i class="fas fa-tag"></i> Category *
+                    </label>
+                    <div class="tag-selector">
+                        <div class="tag-option">
+                            <input type="radio" name="tag" value="Nutrition" id="tag-nutrition" required>
+                            <label for="tag-nutrition" class="tag-label">
+                                <i class="fas fa-apple-alt"></i> Nutrition
+                            </label>
+                        </div>
+                        <div class="tag-option">
+                            <input type="radio" name="tag" value="Workout" id="tag-workout">
+                            <label for="tag-workout" class="tag-label">
+                                <i class="fas fa-dumbbell"></i> Workout
+                            </label>
+                        </div>
+                        <div class="tag-option">
+                            <input type="radio" name="tag" value="Weight Loss" id="tag-weightloss">
+                            <label for="tag-weightloss" class="tag-label">
+                                <i class="fas fa-weight"></i> Weight Loss
+                            </label>
+                        </div>
+                        <div class="tag-option">
+                            <input type="radio" name="tag" value="Muscle Gain" id="tag-muscle">
+                            <label for="tag-muscle" class="tag-label">
+                                <i class="fas fa-heartbeat"></i> Muscle Gain
+                            </label>
+                        </div>
+                        <div class="tag-option">
+                            <input type="radio" name="tag" value="General" id="tag-general">
+                            <label for="tag-general" class="tag-label">
+                                <i class="fas fa-comment-dots"></i> General
+                            </label>
+                        </div>
+                        <div class="tag-option">
+                            <input type="radio" name="tag" value="Supplement" id="tag-supplement">
+                            <label for="tag-supplement" class="tag-label">
+                                <i class="fas fa-pills"></i> Supplement
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="icon-label">
+                        <i class="fas fa-align-left"></i> Description *
+                    </label>
+                    <textarea class="form-control" 
+                              name="statement" 
+                              id="statement"
+                              placeholder="Describe your question or topic in detail... The more information you provide, the better responses you'll get!" 
+                              required
+                              maxlength="5000"></textarea>
+                    <div class="char-counter">
+                        <span id="statement-counter">0</span>/5000 characters
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <a href="/discussion-client-view/" class="btn btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Forum
+                    </a>
+                    <button type="submit" class="btn btn-submit">
+                        <i class="fas fa-paper-plane"></i> Post Discussion
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Character counters
+        document.getElementById('title').addEventListener('input', function() {
+            document.getElementById('title-counter').textContent = this.value.length;
+        });
+
+        document.getElementById('statement').addEventListener('input', function() {
+            document.getElementById('statement-counter').textContent = this.value.length;
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const statement = document.getElementById('statement').value.trim();
+            const tagSelected = document.querySelector('input[name="tag"]:checked');
+
+            if (!title || !statement || !tagSelected) {
+                e.preventDefault();
+                alert('Please fill in all required fields!');
+                return false;
+            }
+
+            if (title.length < 10) {
+                e.preventDefault();
+                alert('Title must be at least 10 characters long!');
+                return false;
+            }
+
+            if (statement.length < 20) {
+                e.preventDefault();
+                alert('Description must be at least 20 characters long!');
+                return false;
+            }
+        });
+    </script>
+</body>
+
+</html>

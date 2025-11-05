@@ -1,0 +1,16 @@
+<!-- @login_required(login_url='clientLogin')
+def planviewClient(request):
+    if Client.objects.filter(user=request.user).exists():
+        planviewClient = Plan.objects.all().order_by('plan_id')
+        return render(request, 'planviewClient.html', {'planviewClient': planviewClient})
+    else:
+        return redirect('clientLogin')
+
+
+@login_required(login_url='clientLogin')
+def wplanContentviewClient(request, wplan_id):
+    if Client.objects.filter(user=request.user).exists():
+        wplanContentviewClient = wPlan_Content.objects.all()[::-1]
+        return render(request, 'wplanContentviewClient.html', {'wplanContentviewClient':wplanContentviewClient , 'wplan_id': wplan_id})
+    else:
+        return redirect('clientLogin') -->

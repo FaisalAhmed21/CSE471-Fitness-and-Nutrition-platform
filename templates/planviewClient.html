@@ -1,0 +1,110 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Client Plans</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url("{% static 'login/images/fitness.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            padding-top: 70px;
+        }
+
+        .navbar {
+            margin-bottom: 20px;
+        }
+
+        .form-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: auto;
+            max-width: 1200px;
+        }
+
+        .message-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Client Dashboard</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a href="/client-profile/" class="nav-link">Profile</a></li>
+                    <li class="nav-item"><a href="/client-wplan-view/" class="nav-link">Workouts</a></li>
+                    <li class="nav-item"><a href="/client-plan-view/" class="nav-link">Diet Plans</a></li>
+                    <li class="nav-item"><a href="/bmi/" class="nav-link">BMI</a></li>
+                    <li class="nav-item"><a href="/workout/" class="nav-link">Tutorials</a></li>
+                    <li class="nav-item"><a href="/tracker/" class="nav-link">Nutrients</a></li>
+                    <li class="nav-item"><a href="/discussion-client-view/" class="nav-link">Discussion Forum</a></li>
+                    <li class="nav-item"><a href="/support&faq/" class="nav-link">Support and FAQ's</a></li>
+                </ul>
+            </div>
+            <form id="logout-form" action="{% url 'logoutUser' %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-form').submit();">
+                Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-content mt-5">
+            {% if messages %}
+                <div class="alert alert-info">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <h2 class="text-center mb-4">Client Plans</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Plan Code</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Points</th>
+                        <th>Trainer</th>
+                        <th>Topic</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plan in planviewClient %}
+                    <tr>
+                        <td>{{ plan.plan_id }}</td>
+                        <td>{{ plan.plan_name }}</td>
+                        <td>{{ plan.plan_description }}</td>
+                        <td>{{ plan.plan_point }}</td>
+                        <td>{{ plan.plan_trainer }}</td>
+                        <td>{{ plan.plan_topic }}</td>
+                        <td>
+                            <a href="/client-plan-content/{{ plan.plan_id }}/" class="btn btn-success btn-sm">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
