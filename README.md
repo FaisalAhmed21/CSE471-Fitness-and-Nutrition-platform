@@ -22,7 +22,7 @@ SQLite
 - Django Session Management
 
 ## Brief Idea About Our Project:
-Our platform is designed to empower individuals to achieve their health and wellness goals through a comprehensive digital ecosystem. It offers tailored fitness programs, nutritional plans, and valuable wellness resources to support users on their journey to better health. The platform combines personalized tracking tools, educational content, community engagement, and expert guidance to create a holistic fitness and nutrition experience. With seamless authentication options and an intuitive interface, users can easily access and manage their wellness journey from personalized dashboards, ensuring they stay committed to their health objectives.
+Our Fitness & Nutrition platform is a comprehensive digital ecosystem that empowers users to reach their health goals through personalized programs, educational content, and community support. The system delivers tailored workout and meal plans with media-rich content, automated BMI and progress tracking, and integrated subscription payments, all accessible from intuitive role-based dashboards (clients, trainers, owners). Users also benefit from tutorial modules, a discussion forum for peer and expert interaction, and an AI chatbot for on-demand coaching and support.
 
 ## To Run the Server:
 In VS Code, open the folder `Fitness and Nutrition platform/hello` and then type `python manage.py runserver` in a new terminal. Run this command from project directory (hello).
