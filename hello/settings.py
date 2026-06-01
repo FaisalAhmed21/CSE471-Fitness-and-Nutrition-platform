@@ -58,6 +58,7 @@ SITE_ID = 1
 MIDDLEWARE = [
     
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise middleware for static file handling
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -198,6 +199,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+STATICSTORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Use WhiteNoise storage for static files
 # SMTP Configuration
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -213,15 +215,15 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'buddiesfit50@gmail.com'
-EMAIL_HOST_PASSWORD = 'hhvqufjnzwkkboxn'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = 'buddiesfit50@gmail.com'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
-STRIPE_SECRET_KEY = 'Your_Stripe_Secret_Key'  # Get your Stripe Secret Key from https://dashboard.stripe.com/apikeys
-STRIPE_PUBLISHABLE_KEY = 'Your_Stripe_Publishable_Key'  # Get your Stripe Publishable Key from https://dashboard.stripe.com/apikeys
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
 STRIPE_PUBLIC_KEY = STRIPE_PUBLISHABLE_KEY  # Alias for templates
 DOMAIN_URL = 'http://127.0.0.1:8000'  # No trailing slash
 
 # Google Gemini API Key for Chatbot
-GEMINI_API_KEY = 'Your_Gemini_API_Key'  # Get free API key from https://makersuite.google.com/app/apikey
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
