@@ -1,0 +1,13 @@
+django
+django-jazzmin
+mysql
+middleware
+django-allauth
+django-mathfilters
+requests
+PyJWT
+cryptography
+pillow
+stripe
+gunicorn
+whitenoise
