@@ -215,15 +215,15 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST_USER = 'buddiesfit50@gmail.com'
+EMAIL_HOST_PASSWORD = 'hhvqufjnzwkkboxn'
 EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+DEFAULT_FROM_EMAIL = 'buddiesfit50@gmail.com'
 
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
-STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_SECRET_KEY = 'sk_test_51RAeByFY2LB9G7C1fDev9bzfqjE6VwutVyousYF6e7GWqDRJMXJtqqrSphniDg5CR1e4IbMyrUCbcBNZ4nE3Qhs300Muhs5edn'
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51RAeByFY2LB9G7C1OJgHnSnazAPJYdBu5x0onfQEYeNnRE33NA6ZQav0Q7haZfxKpkDXokYkIVPYcAajoOZeEgUj00X0jlelGB'
 STRIPE_PUBLIC_KEY = STRIPE_PUBLISHABLE_KEY  # Alias for templates
 DOMAIN_URL = 'http://127.0.0.1:8000'  # No trailing slash
 
-# Google Gemini API Key for Chatbot
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+# OpenRouter API Key for FitBot
+OPENROUTER_API_KEY = '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'

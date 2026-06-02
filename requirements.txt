@@ -11,3 +11,4 @@ pillow
 stripe
 gunicorn
 whitenoise
+openrouter

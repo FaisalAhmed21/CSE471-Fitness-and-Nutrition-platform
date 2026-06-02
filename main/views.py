@@ -1424,7 +1424,7 @@ def cancel_view(request):
 @require_POST
 def chatbot_response(request):
     """
-    Handle chatbot messages and return AI responses using Google Gemini
+    Handle chatbot messages and return AI responses using OpenRouter DeepSeek
     """
     try:
         data = json.loads(request.body)
@@ -1434,16 +1434,13 @@ def chatbot_response(request):
             return JsonResponse({'error': 'No message provided'}, status=400)
         
         # Check if API key is configured
-        if not hasattr(settings, 'GEMINI_API_KEY') or settings.GEMINI_API_KEY == 'your_gemini_api_key_here':
-            print("Gemini API key not configured")
+        if not getattr(settings, 'OPENROUTER_API_KEY', '').strip():
+            print("OpenRouter API key not configured")
             return JsonResponse({
-                'response': "FitBot needs to be configured with a Gemini API key. Please contact the administrator. Meanwhile, I can still chat! What's your fitness question? 💪"
+                'response': "FitBot needs to be configured with an OpenRouter API key. Please contact the administrator. Meanwhile, I can still chat! What's your fitness question? 💪"
             })
-        
-        # Use REST API directly instead of SDK
-        import requests as req
-        
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={settings.GEMINI_API_KEY}"
+
+        from openrouter import OpenRouter
         
         # Create fitness-focused prompt
         fitness_prompt = f"""You are FitBot, an expert AI fitness and nutrition assistant. 
@@ -1464,25 +1461,23 @@ def chatbot_response(request):
                 }]
             }]
         }
-        
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        
+
         # Get AI response
-        print(f"Sending to Gemini: {user_message}")
-        response = req.post(api_url, json=payload, headers=headers)
-        
-        if response.status_code == 200:
-            result = response.json()
-            ai_response = result['candidates'][0]['content']['parts'][0]['text']
-            print(f"Gemini response: {ai_response}")
-            return JsonResponse({'response': ai_response})
-        else:
-            print(f"API Error: {response.status_code} - {response.text}")
-            return JsonResponse({
-                'response': "I'm having trouble connecting to my AI brain right now. Try asking: 'What exercises help lose weight?' or 'Best protein sources?' 💪"
-            })
+        print(f"Sending to DeepSeek via OpenRouter: {user_message}")
+        with OpenRouter(api_key=settings.OPENROUTER_API_KEY) as client:
+            response = client.chat.send(
+                model="deepseek/deepseek-r1",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": fitness_prompt,
+                    }
+                ]
+            )
+
+        ai_response = response.choices[0].message.content
+        print(f"OpenRouter response: {ai_response}")
+        return JsonResponse({'response': ai_response})
         
     except Exception as e:
         error_message = str(e)
