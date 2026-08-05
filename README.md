@@ -153,5 +153,10 @@ To enable the FitBot AI chatbot feature, you need a free Google Gemini API key:
 ### Stripe:
 - Use Stripe test cards for testing payments
 
+
+## QA Testing
+
+A separate QA strategy and testing capstone was independently conducted on this application, covering risk-based test planning, manual and automated testing, a confirmed defect report, performance testing, and accessibility findings: https://github.com/FaisalAhmed21/QA-Strategy-Capstone
+
 ### Contributors
 [Faisal Ahmed](https://github.com/FaisalAhmed21) | [MD. Shafiur Rahman](https://github.com/ShafiurShuvo) | [Nazia Mumtahina](https://github.com/NaziaMumtahina) | [Sara Jerin Prithila](https://github.com/jerinsync)
