@@ -3,7 +3,7 @@
 
 Our Fitness & Nutrition platform is a comprehensive digital ecosystem that empowers users to reach their health goals through personalized programs, educational content, and community support. The system delivers tailored workout and meal plans with media-rich content, automated BMI and progress tracking, and integrated subscription payments, all accessible from intuitive role-based dashboards (clients, trainers, owners). Users also benefit from tutorial modules, a highly scalable discussion forum, and an AI chatbot for on-demand coaching and support.
 
-## 🚀 Technology Stack & Architecture
+## Technology Stack & Architecture
 
 - **Languages:** HTML, CSS, JS, Python
 - **Framework:** Django 5.1, Bootstrap
@@ -15,7 +15,7 @@ Our Fitness & Nutrition platform is a comprehensive digital ecosystem that empow
 - **AI Integration:** OpenRouter (DeepSeek/LLMs)
 - **Nutrition Data:** Official USDA FoodData Central API
 
-## 🏗️ Architectural Highlights (Deep Analysis)
+## Architectural Highlights (Deep Analysis)
 
 - **Scalable Community Forum:** The discussion forum utilizes PostgreSQL's robust concurrency control. This completely eliminates the `database is locked` errors common in SQLite, allowing thousands of users to upvote and reply simultaneously without crashing the application.
 - **Secure Premium Content Delivery:** The Diet (`Plan`) and Workout (`wPlan`) architectures use a Parent-Child relationship. More importantly, they employ `uuid.uuid4` (Universally Unique Identifiers) for their Primary Keys instead of auto-incrementing integers. This prevents URL manipulation and securely protects premium content from unauthorized access.
@@ -39,7 +39,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-## 🔑 Environment Variables & API Configuration
+## Environment Variables & API Configuration
 
 For the platform to function correctly, you **MUST** create a `.env` file in your root folder (where `manage.py` is located) and configure the following variables.
 
@@ -76,7 +76,7 @@ USDA_API_KEY=your_usda_api_key_here
 
 ---
 
-## 👤 Default Login Information
+## Default Login Information
 
 ### Clients
 - **Username:** nazia | **Password:** 1
@@ -93,7 +93,7 @@ USDA_API_KEY=your_usda_api_key_here
 
 ---
 
-## 🌟 Project Features
+## Project Features
 
 ### Module 1: Authentication & User Management
 - Log in, Log out, Sign Up
@@ -120,7 +120,7 @@ USDA_API_KEY=your_usda_api_key_here
 
 ---
 
-## 💳 Payment Gateway Integration
+## Payment Gateway Integration
 
 ### How bKash Payment Works
 The platform includes a robust bKash payment flow simulation for users subscribing to premium plans. When a user selects bKash:
@@ -135,11 +135,11 @@ The platform includes a robust bKash payment flow simulation for users subscribi
 
 ---
 
-## 🧪 Quality Assurance Test
+## Quality Assurance Test
 A comprehensive Quality Assurance test was performed on this project. 
 [Click here to view the QA Test Strategy & Report Repo](https://github.com/FaisalAhmed21/QA-Strategy-Capstone)
 
 ---
 
-## 👥 Contributors
+## Contributors
 [Faisal Ahmed](https://github.com/FaisalAhmed21) | [MD. Shafiur Rahman](https://github.com/ShafiurShuvo) | [Nazia Mumtahina](https://github.com/NaziaMumtahina) | [Sara Jerin Prithila](https://github.com/jerinsync)
