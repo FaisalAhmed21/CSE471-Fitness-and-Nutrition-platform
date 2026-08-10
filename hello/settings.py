@@ -233,3 +233,5 @@ OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', 'sk-or-v1-9464419e876c3c8cd
 
 UDDOKTAPAY_API_KEY = os.getenv('UDDOKTAPAY_API_KEY', 'your-uddoktapay-api-key')
 UDDOKTAPAY_BASE_URL = os.getenv('UDDOKTAPAY_BASE_URL', 'https://your-uddoktapay-url.com')
+
+NINJA_API_KEY = os.getenv('NINJA_API_KEY', 'IF7UO25/zTEhl8LgzwncKw==EXlc6j1YbuGyqgJm')

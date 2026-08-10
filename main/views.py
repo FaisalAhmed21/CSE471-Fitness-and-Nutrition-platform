@@ -927,7 +927,8 @@ def tracker(request):
     if request.method == 'POST':
         query = request.POST['query']
         api_url = 'https://api.api-ninjas.com/v1/nutrition?query='
-        api_request = requests.get(api_url + query, headers={'X-Api-Key': 'IF7UO25/zTEhl8LgzwncKw==EXlc6j1YbuGyqgJm'})
+        api_key = getattr(settings, 'NINJA_API_KEY', 'IF7UO25/zTEhl8LgzwncKw==EXlc6j1YbuGyqgJm')
+        api_request = requests.get(api_url + query, headers={'X-Api-Key': api_key})
         try:
             api = json.loads(api_request.content)
             print(api_request.content)
