@@ -8,7 +8,7 @@ User = get_user_model()
 
 class Client(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    client_usrname = models.CharField(max_length=10, unique=True)
+    client_usrname = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=200, blank=True, null=True)
     last_name = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField(max_length=200, blank=True, null=True)
@@ -202,7 +202,7 @@ class wPlan_Content(models.Model):
     
 
 class Enroll(models.Model):      
-    client_usrname = models.CharField(max_length=10, unique=True)
+    client_usrname = models.CharField(max_length=150, unique=True)
     Email=models.EmailField(max_length=200, blank=True, null=True)
     Gender=models.CharField(max_length=15, blank=True, null=True)
     phone=models.CharField(max_length=15, blank=True, null=True)
