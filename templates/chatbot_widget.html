@@ -467,10 +467,10 @@
         
         const typingIndicator = document.querySelector('.typing-indicator');
         if (typingIndicator) {
-            fitbotMessages.insertBefore(messageDiv, typingIndicator);
-        } else {
-            fitbotMessages.appendChild(messageDiv);
+            fitbotMessages.removeChild(typingIndicator);
         }
+        
+        fitbotMessages.appendChild(messageDiv);
         fitbotMessages.scrollTop = fitbotMessages.scrollHeight;
     }
 
