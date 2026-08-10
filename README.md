@@ -120,22 +120,24 @@ USDA_API_KEY=your_usda_api_key_here
 
 ---
 
-## 💳 Payment Testing (Sandbox Mode)
+## 💳 Payment Gateway Integration
 
-### bKash Test Credentials (Simulated Sandbox)
-- **Phone Number:** Any valid 11-digit number starting with 01 (e.g., `01712345678`)
-- **PIN:** Any 5-digit number (e.g., `12345`)
-- **OTP:** Use the 6-digit auto-generated OTP shown on screen
-- *Note: No real money is charged in sandbox mode.*
+### How bKash Payment Works
+The platform includes a robust bKash payment flow simulation for users subscribing to premium plans. When a user selects bKash:
+1. **Phone Number Verification:** The user enters a valid 11-digit bKash account number starting with '01' (e.g., `01712345678`).
+2. **PIN Verification:** The user enters their 5-digit secret PIN (e.g., `12345`).
+3. **OTP Verification:** A 6-digit OTP is generated and displayed on-screen (for simulation purposes). The user enters this OTP to verify the transaction.
+4. **Confirmation:** Upon successful OTP verification, the payment is processed, and the user's membership is instantly upgraded!
+*(Note: As this is a portfolio project, no real money is charged during this simulation flow.)*
 
 ### Stripe Test Credentials
-- Use official Stripe test cards for simulating successful or declined payments.
+- Use official Stripe test cards for simulating successful or declined international payments.
 
 ---
 
 ## 🧪 Quality Assurance Test
 A comprehensive Quality Assurance test was performed on this project. 
-[Click here to view the QA Test Report](#) *(Link to be updated)*
+[Click here to view the QA Test Strategy & Report Repo](https://github.com/FaisalAhmed21/QA-Strategy-Capstone)
 
 ---
 
