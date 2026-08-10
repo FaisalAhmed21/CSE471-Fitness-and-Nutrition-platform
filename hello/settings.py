@@ -234,6 +234,10 @@ DOMAIN_URL = os.getenv('DOMAIN_URL', 'http://127.0.0.1:8000')
 
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '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')
 
+# Tell Django it is behind an HTTPS proxy (Render load balancer) so Allauth generates https:// callback URLs
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
 UDDOKTAPAY_API_KEY = os.getenv('UDDOKTAPAY_API_KEY', 'your-uddoktapay-api-key')
 UDDOKTAPAY_BASE_URL = os.getenv('UDDOKTAPAY_BASE_URL', 'https://your-uddoktapay-url.com')
 
