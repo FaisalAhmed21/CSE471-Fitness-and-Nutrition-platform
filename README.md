@@ -122,13 +122,13 @@ USDA_API_KEY=your_usda_api_key_here
 
 ## Payment Gateway Integration
 
-### How bKash Payment Works
-The platform includes a robust bKash payment flow simulation for users subscribing to premium plans. When a user selects bKash:
-1. **Phone Number Verification:** The user enters a valid 11-digit bKash account number starting with '01' (e.g., `01712345678`).
-2. **PIN Verification:** The user enters their 5-digit secret PIN (e.g., `12345`).
-3. **OTP Verification:** A 6-digit OTP is generated and displayed on-screen (for simulation purposes). The user enters this OTP to verify the transaction.
-4. **Confirmation:** Upon successful OTP verification, the payment is processed, and the user's membership is instantly upgraded!
-*(Note: As this is a portfolio project, no real money is charged during this simulation flow.)*
+### How bKash & Local Payments Work (UddoktaPay Integration)
+The platform seamlessly handles local Bangladeshi payments (like bKash, Nagad, etc.) via the **UddoktaPay** aggregator API. When a user selects a local payment method:
+1. **Checkout Initialization:** The system securely sends the user's enrollment metadata (ID, email, amount) to the UddoktaPay `/api/checkout-v2` endpoint.
+2. **Gateway Redirect:** The user is dynamically redirected to the secure UddoktaPay checkout page.
+3. **Transaction:** The user completes the payment directly on the gateway (e.g., entering their bKash details and transaction ID).
+4. **Automated Webhook/Success Redirect:** Upon successful payment, UddoktaPay redirects the user back to `/subscription-success/` and instantly activates their premium membership.
+*(Note: If UddoktaPay is unconfigured in the `.env` file, the system safely falls back to a sandbox simulation mode).*
 
 ### Stripe Test Credentials
 - Use official Stripe test cards for simulating successful or declined international payments.
