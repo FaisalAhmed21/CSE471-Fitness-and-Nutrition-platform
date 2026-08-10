@@ -181,7 +181,16 @@ def clientProfile(request):
             last_name=user.last_name or ""
         )
     
-    return render(request, 'client_profile.html', {'user': obj, "client": "client"})
+    try:
+        enrollment = Enroll.objects.get(client_usrname=user.username)
+    except Enroll.DoesNotExist:
+        enrollment = None
+        
+    return render(request, 'client_profile.html', {
+        'user': obj, 
+        'client': 'client',
+        'enrollment': enrollment
+    })
     
 
 @login_required(login_url='trainerLogin')
@@ -1025,12 +1034,8 @@ def process_enrollment(request):
 @login_required(login_url='clientLogin')
 def bkash_payment(request):
     """
-    Handle bKash payment with realistic multi-step flow (sandbox/test mode)
-    Steps: 1) Enter phone, 2) Enter PIN, 3) Enter OTP, 4) Payment confirmation
+    Handle bKash payment via UddoktaPay checkout
     """
-    import re
-    import random
-    
     enrollment_id = request.session.get('pending_enrollment_id')
     if not enrollment_id:
         messages.error(request, 'No pending enrollment found.')
@@ -1042,169 +1047,58 @@ def bkash_payment(request):
         messages.error(request, 'Enrollment not found.')
         return redirect('enrollment')
 
-    # Get current payment step (default is 'phone')
-    payment_step = request.session.get('bkash_payment_step', 'phone')
-
-    if request.method == 'POST':
-        action = request.POST.get('action', '')
-        
-        # Step 1: Phone number verification
-        if action == 'verify_phone':
-            phone = request.POST.get('phone', '').strip()
-            
-            # Validate phone number format
-            if not re.match(r'^01[3-9]\d{8}$', phone):
-                messages.error(request, 'Invalid bKash account number. Please enter a valid 11-digit number starting with 01.')
-                return render(request, 'bkash_payment.html', {
-                    'enrollment': enrollment,
-                    'payment_step': 'phone'
-                })
-            
-            # Store phone in session
-            request.session['bkash_phone'] = phone
-            request.session['bkash_payment_step'] = 'pin'
-            
-            return render(request, 'bkash_payment.html', {
-                'enrollment': enrollment,
-                'payment_step': 'pin',
-                'phone': phone
-            })
-        
-        # Step 2: PIN verification
-        elif action == 'verify_pin':
-            pin = request.POST.get('pin', '').strip()
-            phone = request.session.get('bkash_phone', '')
-            
-            # Validate PIN format
-            if not re.match(r'^\d{5}$', pin):
-                messages.error(request, 'Invalid PIN. Please enter a 5-digit PIN.')
-                return render(request, 'bkash_payment.html', {
-                    'enrollment': enrollment,
-                    'payment_step': 'pin',
-                    'phone': phone
-                })
-            
-            # Simulate PIN verification delay and generate OTP
-            generated_otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-            request.session['bkash_otp'] = generated_otp
-            request.session['bkash_payment_step'] = 'otp'
-            
-            # In real bKash, OTP is sent to phone. In sandbox, we show it on screen
-            return render(request, 'bkash_payment.html', {
-                'enrollment': enrollment,
-                'payment_step': 'otp',
-                'phone': phone,
-                'generated_otp': generated_otp  # Only for sandbox testing
-            })
-        
-        # Step 3: OTP verification
-        elif action == 'verify_otp':
-            otp = request.POST.get('otp', '').strip()
-            phone = request.session.get('bkash_phone', '')
-            stored_otp = request.session.get('bkash_otp', '')
-            
-            # Validate OTP format
-            if not re.match(r'^\d{6}$', otp):
-                messages.error(request, 'Invalid OTP format. Please enter a 6-digit OTP.')
-                return render(request, 'bkash_payment.html', {
-                    'enrollment': enrollment,
-                    'payment_step': 'otp',
-                    'phone': phone,
-                    'generated_otp': stored_otp
-                })
-            
-            # In sandbox mode, accept any 6-digit OTP or the generated one
-            if len(otp) != 6:
-                messages.error(request, 'Invalid OTP. Please try again.')
-                return render(request, 'bkash_payment.html', {
-                    'enrollment': enrollment,
-                    'payment_step': 'otp',
-                    'phone': phone,
-                    'generated_otp': stored_otp
-                })
-            
-            # Move to confirmation step
-            request.session['bkash_payment_step'] = 'confirm'
-            
-            return render(request, 'bkash_payment.html', {
-                'enrollment': enrollment,
-                'payment_step': 'confirm',
-                'phone': phone
-            })
-        
-        # Step 4: Final payment confirmation
-        elif action == 'confirm_payment':
-            phone = request.session.get('bkash_phone', '')
-            
-            # Generate transaction ID
-            transaction_id = f"BK{random.randint(10000000, 99999999)}{random.randint(100, 999)}"
-            
-            # Calculate subscription dates
-            membership_prices = {
-                "1 month - 1000 Taka": 30,
-                "3 month - 2500 Taka": 90,
-                "6 month - 4000 Taka": 180,
-                "1 year - 6000 Taka": 365,
-            }
-
-            duration = membership_prices.get(enrollment.member, 30)
-            start_date = timezone.now()
-            end_date = start_date + timedelta(days=duration)
-
-            # Update enrollment with payment success
-            enrollment.paymentStatus = 'Completed'
-            enrollment.subscription_start_date = start_date
-            enrollment.subscription_end_date = end_date
-            enrollment.DueDate = end_date
-            enrollment.is_active = True
-            enrollment.phone = phone
-            enrollment.save()
-
-            # Clear bKash session data
-            for key in ['bkash_phone', 'bkash_otp', 'bkash_payment_step', 'pending_enrollment_id']:
-                if key in request.session:
-                    del request.session[key]
-
-            # Store transaction info for success page
-            request.session['show_payment_alert'] = True
-            request.session['transaction_id'] = transaction_id
-            request.session['payment_method'] = 'bKash'
-
-            messages.success(request, f'Payment successful! Transaction ID: {transaction_id}')
-            return redirect('subscription_success')
-        
-        # Back button handling
-        elif action == 'back':
-            current_step = request.session.get('bkash_payment_step', 'phone')
-            step_flow = ['phone', 'pin', 'otp', 'confirm']
-            
-            if current_step in step_flow:
-                current_index = step_flow.index(current_step)
-                if current_index > 0:
-                    new_step = step_flow[current_index - 1]
-                    request.session['bkash_payment_step'] = new_step
-                    payment_step = new_step
-            
-            phone = request.session.get('bkash_phone', '')
-            generated_otp = request.session.get('bkash_otp', '')
-            
-            return render(request, 'bkash_payment.html', {
-                'enrollment': enrollment,
-                'payment_step': payment_step,
-                'phone': phone,
-                'generated_otp': generated_otp if payment_step == 'otp' else None
-            })
-
-    # GET request - show appropriate step
-    phone = request.session.get('bkash_phone', '')
-    generated_otp = request.session.get('bkash_otp', '')
+    # Get user full name
+    full_name = request.user.get_full_name() or request.user.username
     
-    return render(request, 'bkash_payment.html', {
-        'enrollment': enrollment,
-        'payment_step': payment_step,
-        'phone': phone,
-        'generated_otp': generated_otp if payment_step == 'otp' else None
-    })
+    # Setup UddoktaPay API request
+    api_key = getattr(settings, 'UDDOKTAPAY_API_KEY', '')
+    base_url = getattr(settings, 'UDDOKTAPAY_BASE_URL', '').rstrip('/')
+    
+    if not api_key or not base_url:
+        messages.error(request, 'Payment gateway configuration is missing.')
+        return redirect('enrollment')
+        
+    endpoint = f"{base_url}/api/checkout-v2"
+    headers = {
+        "RT-UDDOKTAPAY-API-KEY": api_key,
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "full_name": full_name,
+        "email": enrollment.Email or request.user.email,
+        "amount": str(enrollment.Price),
+        "metadata": {
+            "enrollment_id": str(enrollment.id),
+            "username": enrollment.client_usrname
+        },
+        "redirect_url": settings.DOMAIN_URL + '/subscription-success/',
+        "cancel_url": settings.DOMAIN_URL + '/payment-cancelled/',
+        "return_type": "GET"
+    }
+    
+    try:
+        response = requests.post(endpoint, headers=headers, json=payload)
+        response_data = response.json()
+        
+        if response.status_code == 200 and response_data.get('status'):
+            checkout_url = response_data.get('payment_url')
+            # UddoktaPay returns 'payment_url' and sometimes 'invoice_id'
+            # Or we can just grab 'invoice_id' from the response if present
+            # But according to requirements, we must store the returned invoice_id
+            invoice_id = response_data.get('invoice_id')
+            if invoice_id:
+                enrollment.invoice_id = invoice_id
+                enrollment.save()
+            return redirect(checkout_url)
+        else:
+            messages.error(request, f'Payment gateway error: {response_data.get("message", "Unknown error")}')
+            return redirect('enrollment')
+            
+    except Exception as e:
+        messages.error(request, f'Error initiating payment: {str(e)}')
+        return redirect('enrollment')
+
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -1347,8 +1241,71 @@ def stripe_success(request):
 @login_required(login_url='clientLogin')
 def subscription_success(request):
     """
-    Show subscription success page with details
+    Show subscription success page with details (and handle UddoktaPay verification)
     """
+    invoice_id = request.GET.get('invoice_id')
+    status = request.GET.get('status')
+    
+    # UddoktaPay verification flow
+    if invoice_id:
+        try:
+            api_key = getattr(settings, 'UDDOKTAPAY_API_KEY', '')
+            base_url = getattr(settings, 'UDDOKTAPAY_BASE_URL', '').rstrip('/')
+            
+            verify_url = f"{base_url}/api/verify-payment"
+            headers = {
+                "RT-UDDOKTAPAY-API-KEY": api_key,
+                "Content-Type": "application/json"
+            }
+            payload = {"invoice_id": invoice_id}
+            
+            response = requests.post(verify_url, headers=headers, json=payload)
+            verify_data = response.json()
+            
+            if response.status_code == 200 and str(verify_data.get('status')).upper() == 'COMPLETED':
+                metadata = verify_data.get('metadata', {})
+                enrollment_id = metadata.get('enrollment_id')
+                
+                if enrollment_id:
+                    enrollment = Enroll.objects.get(id=enrollment_id, client_usrname=request.user.username)
+                    
+                    if not enrollment.is_active or enrollment.paymentStatus != 'Completed':
+                        # Verify amount
+                        api_amount = float(verify_data.get('amount', 0))
+                        expected_amount = float(enrollment.Price)
+                        
+                        if api_amount == expected_amount:
+                            # Activate subscription
+                            membership_prices = {
+                                "1 month - 1000 Taka": 30,
+                                "3 month - 2500 Taka": 90,
+                                "6 month - 4000 Taka": 180,
+                                "1 year - 6000 Taka": 365,
+                            }
+                            duration = membership_prices.get(enrollment.member, 30)
+                            start_date = timezone.now()
+                            end_date = start_date + timedelta(days=duration)
+
+                            enrollment.paymentStatus = 'Completed'
+                            enrollment.subscription_start_date = start_date
+                            enrollment.subscription_end_date = end_date
+                            enrollment.DueDate = end_date
+                            enrollment.is_active = True
+                            enrollment.invoice_id = invoice_id
+                            enrollment.save()
+                            
+                            if 'pending_enrollment_id' in request.session:
+                                del request.session['pending_enrollment_id']
+                            
+                            request.session['show_payment_alert'] = True
+                        else:
+                            messages.error(request, 'Payment amount mismatch. Subscription not activated.')
+                            return redirect('enrollment')
+        except Exception as e:
+            print(f"UddoktaPay Verification Error: {e}")
+            pass # Fall through to standard rendering if not found
+            
+    # Standard rendering flow
     try:
         enrollment = Enroll.objects.get(client_usrname=request.user.username)
         
@@ -1463,21 +1420,22 @@ def chatbot_response(request):
         }
 
         # Get AI response
-        print(f"Sending to DeepSeek via OpenRouter: {user_message}")
-        with OpenRouter(api_key=settings.OPENROUTER_API_KEY) as client:
-            response = client.chat.send(
-                model="deepseek/deepseek-r1",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": fitness_prompt,
-                    }
-                ]
-            )
-
-        ai_response = response.choices[0].message.content
-        print(f"OpenRouter response: {ai_response}")
-        return JsonResponse({'response': ai_response})
+        headers = {
+            "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "openrouter/free",
+            "messages": [{"role": "user", "content": fitness_prompt}],
+            "max_tokens": 1000
+        }
+        api_resp = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+        
+        if api_resp.status_code == 200:
+            ai_response = api_resp.json()["choices"][0]["message"]["content"]
+            return JsonResponse({'response': ai_response})
+        else:
+            raise Exception(f"API Error {api_resp.status_code}: {api_resp.text}")
         
     except Exception as e:
         error_message = str(e)

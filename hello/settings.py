@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,12 +27,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pna@3h#+^-sglelk3p7-2$b1$d9^n4qtf+&bk=4b=d%s$6&*=r'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-pna@3h#+^-sglelk3p7-2$b1$d9^n4qtf+&bk=4b=d%s$6&*=r')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 # Application definition
 
@@ -99,6 +102,10 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  # Use os.path.join with strings
     }
 }
+
+# Use PostgreSQL if DATABASE_URL is provided by hosting environment
+if os.getenv('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.parse(os.getenv('DATABASE_URL'))
 
 
 # Password validation
@@ -194,7 +201,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-#STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -220,10 +227,14 @@ EMAIL_HOST_PASSWORD = 'hhvqufjnzwkkboxn'
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = 'buddiesfit50@gmail.com'
 
-STRIPE_SECRET_KEY = 'sk_test_51RAeByFY2LB9G7C1fDev9bzfqjE6VwutVyousYF6e7GWqDRJMXJtqqrSphniDg5CR1e4IbMyrUCbcBNZ4nE3Qhs300Muhs5edn'
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51RAeByFY2LB9G7C1OJgHnSnazAPJYdBu5x0onfQEYeNnRE33NA6ZQav0Q7haZfxKpkDXokYkIVPYcAajoOZeEgUj00X0jlelGB'
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'sk_test_51RAeByFY2LB9G7C1fDev9bzfqjE6VwutVyousYF6e7GWqDRJMXJtqqrSphniDg5CR1e4IbMyrUCbcBNZ4nE3Qhs300Muhs5edn')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', 'pk_test_51RAeByFY2LB9G7C1OJgHnSnazAPJYdBu5x0onfQEYeNnRE33NA6ZQav0Q7haZfxKpkDXokYkIVPYcAajoOZeEgUj00X0jlelGB')
 STRIPE_PUBLIC_KEY = STRIPE_PUBLISHABLE_KEY  # Alias for templates
-DOMAIN_URL = 'http://127.0.0.1:8000'  # No trailing slash
+DOMAIN_URL = os.getenv('DOMAIN_URL', 'http://127.0.0.1:8000')  # Fallback to localhost
 
 # OpenRouter API Key for FitBot
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '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')
+
+# UddoktaPay Settings
+UDDOKTAPAY_API_KEY = os.getenv('UDDOKTAPAY_API_KEY', 'your-uddoktapay-api-key')
+UDDOKTAPAY_BASE_URL = os.getenv('UDDOKTAPAY_BASE_URL', 'https://your-uddoktapay-url.com')

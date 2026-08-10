@@ -214,6 +214,7 @@ class Enroll(models.Model):
     subscription_start_date=models.DateTimeField(blank=True,null=True)
     subscription_end_date=models.DateTimeField(blank=True,null=True)
     is_active=models.BooleanField(default=False)
+    invoice_id=models.CharField(max_length=100, blank=True, null=True)
     timeStamp=models.DateTimeField(auto_now_add=True,blank=True)
 
     def __str__(self):
@@ -230,7 +231,7 @@ class Enroll(models.Model):
 
 class MembershipPlan(models.Model):
     plan=models.CharField(max_length=185)
-    price=models.IntegerField(max_length=55)
+    price=models.IntegerField()
 
     def __int__(self):
         return self.id
