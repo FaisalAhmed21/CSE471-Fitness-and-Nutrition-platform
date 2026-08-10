@@ -8,7 +8,7 @@ HTML, CSS, JS, Python, SQLite
 Django, Bootstrap, Stripe API
 
 ## DBMS:
-SQLite
+PostgreSQL (Supabase) / SQLite (Local Development)
 
 ## Used Django Features:
 - Django Model
@@ -16,10 +16,11 @@ SQLite
 - Django Static Files
 - Django Templates
 - Django Authentication
-- Django Allauth (Social Authentication)
+- Django Allauth (Social Authentication - Google & GitHub)
 - Django Signals
 - Django Middleware
 - Django Session Management
+- **Deployment:** Render (Hosting) & Supabase (PostgreSQL)
 
 ## Brief Idea About Our Project:
 Our Fitness & Nutrition platform is a comprehensive digital ecosystem that empowers users to reach their health goals through personalized programs, educational content, and community support. The system delivers tailored workout and meal plans with media-rich content, automated BMI and progress tracking, and integrated subscription payments, all accessible from intuitive role-based dashboards (clients, trainers, owners). Users also benefit from tutorial modules, a discussion forum for peer and expert interaction, and an AI chatbot for on-demand coaching and support.
@@ -67,25 +68,39 @@ After downloading the project, you **MUST** configure your Stripe API keys to en
 
 **Note:** Without configuring Stripe API keys, the Stripe payment option will not work. bKash sandbox mode will work without any configuration.
 
-### Google Gemini API Configuration (Required for AI Chatbot)
+### OpenRouter API Configuration (Required for AI Chatbot)
 
-To enable the FitBot AI chatbot feature, you need a free Google Gemini API key:
+To enable the FitBot AI chatbot feature, you need a free OpenRouter API key:
 
-**Step 1: Get Your Gemini API Key**
-1. Visit [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+**Step 1: Get Your OpenRouter API Key**
+1. Visit [https://openrouter.ai/](https://openrouter.ai/)
 2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the generated API key
+3. Click on "Keys" and generate a new API key
 
 **Step 2: Update the Configuration File**
-1. Open the file: `hello/settings.py`
-2. Find this line (around line 230):
-   ```python
-   GEMINI_API_KEY = 'your_gemini_api_key_here'
-   ```
-3. Replace `'your_gemini_api_key_here'` with your actual API key
+Create a `.env` file in your root folder and add:
+```
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+```
 
-**Note:** Without configuring the Gemini API key, the chatbot will show a fallback response. The API is free with generous limits.
+### Social Authentication Configuration (Google & GitHub)
+Social logins are configured directly via Environment Variables to prevent database synchronization issues during deployment.
+
+Create a `.env` file in your root folder and add your OAuth keys:
+```
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+```
+
+### USDA FoodData Central API (Required for Nutrition Tracker)
+The nutrition tracking feature uses the official USDA API. It works with a default DEMO_KEY, but you can configure your own key for higher rate limits.
+Add this to your `.env` file:
+```
+USDA_API_KEY=your_usda_api_key_here
+```
 
 ## Login Info:
 
@@ -125,15 +140,14 @@ To enable the FitBot AI chatbot feature, you need a free Google Gemini API key:
 - Notification reminder
 - BMI page
 - Exercise video tutorial play
-- Nutrition values
+- Nutrition values (Powered by official USDA FoodData Central Database)
 - Support and FAQs
 - Community Discussion Forum
   - Post, view, and reply to discussions
   - One-time upvote and unique view tracking per user
 - **AI-Powered FitBot Chatbot**
   - Real-time fitness and nutrition guidance
-  - Voice input support with speech recognition
-  - Powered by Google Gemini AI
+  - Powered by OpenRouter AI
 
 ### Module 3:
 - Subscription management and renewal
