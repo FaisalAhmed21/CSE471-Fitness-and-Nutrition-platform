@@ -925,15 +925,36 @@ def tracker(request):
     import requests
     if request.method == 'POST':
         query = request.POST['query']
-        api_url = 'https://api.api-ninjas.com/v1/nutrition?query='
-        api_key = getattr(settings, 'NINJA_API_KEY', 'IF7UO25/zTEhl8LgzwncKw==EXlc6j1YbuGyqgJm')
-        api_request = requests.get(api_url + query, headers={'X-Api-Key': api_key})
         try:
-            api = json.loads(api_request.content)
-            print(api_request.content)
+            # Use USDA FoodData Central API as a free alternative to API Ninjas
+            api_key = getattr(settings, 'USDA_API_KEY', 'DEMO_KEY')
+            url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={query}&pageSize=1&api_key={api_key}"
+            r = requests.get(url, timeout=10).json()
+            
+            if not r.get("foods"):
+                api = "oops! There was an error"
+            else:
+                food = r["foods"][0]
+                nutrients = {n['nutrientName']: n.get('value', 0) for n in food.get('foodNutrients', [])}
+                
+                # Map USDA format to exactly match the API Ninjas format expected by tracker.html
+                api = [{
+                    "name": query.lower(),
+                    "calories": nutrients.get("Energy", 0),
+                    "serving_size_g": 100.0,
+                    "fat_total_g": nutrients.get("Total lipid (fat)", 0),
+                    "fat_saturated_g": nutrients.get("Fatty acids, total saturated", 0),
+                    "protein_g": nutrients.get("Protein", 0),
+                    "sodium_mg": nutrients.get("Sodium, Na", 0),
+                    "potassium_mg": nutrients.get("Potassium, K", 0),
+                    "cholesterol_mg": nutrients.get("Cholesterol", 0),
+                    "carbohydrates_total_g": nutrients.get("Carbohydrate, by difference", 0),
+                    "fiber_g": nutrients.get("Fiber, total dietary", 0),
+                    "sugar_g": nutrients.get("Sugars, total including NLEA", 0),
+                }]
         except Exception as e:
             api = "oops! There was an error"
-            print(e)
+            print(f"Tracker error: {e}")
         return render(request, 'tracker.html', {'api': api})
     else:
         return render(request, 'tracker.html', {'query': 'Enter a valid query'})
