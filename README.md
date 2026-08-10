@@ -122,14 +122,20 @@ USDA_API_KEY=your_usda_api_key_here
 
 ## 💳 Payment Testing (Sandbox Mode)
 
-### bKash Test Credentials
+### bKash Test Credentials (Simulated Sandbox)
 - **Phone Number:** Any valid 11-digit number starting with 01 (e.g., `01712345678`)
 - **PIN:** Any 5-digit number (e.g., `12345`)
 - **OTP:** Use the 6-digit auto-generated OTP shown on screen
-- *No real money is charged in sandbox mode.*
+- *Note: No real money is charged in sandbox mode.*
 
 ### Stripe Test Credentials
 - Use official Stripe test cards for simulating successful or declined payments.
+
+---
+
+## 🧪 Quality Assurance Test
+A comprehensive Quality Assurance test was performed on this project. 
+[Click here to view the QA Test Report](#) *(Link to be updated)*
 
 ---
 
