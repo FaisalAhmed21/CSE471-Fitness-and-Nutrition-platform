@@ -46,7 +46,7 @@ class Trainer(models.Model):
 
 class Owner(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    owner_usrname = models.CharField(max_length=10, unique=True, default="head")
+    owner_usrname = models.CharField(max_length=50, unique=True, default="head")
     first_name = models.CharField(max_length=200, blank=True, null=True)
     last_name = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField(max_length=200, blank=True, null=True)

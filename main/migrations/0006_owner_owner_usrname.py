@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='owner',
             name='owner_usrname',
-            field=models.CharField(default='Choose option', max_length=10, unique=True),
+            field=models.CharField(default='Choose option', max_length=50, unique=True),
         ),
     ]
