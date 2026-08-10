@@ -180,8 +180,18 @@ def clientProfile(request):
             first_name=user.first_name or "",
             last_name=user.last_name or ""
         )
+    # Get enrollment data
+    enrollment = None
+    try:
+        enrollment = Enroll.objects.filter(client_usrname=user.username).order_by('-id').first()
+    except Exception as e:
+        pass
     
-    return render(request, 'client_profile.html', {'user': obj, "client": "client"})
+    return render(request, 'client_profile.html', {
+        'user': obj, 
+        'client': 'client',
+        'enrollment': enrollment
+    })
     
 
 @login_required(login_url='trainerLogin')
