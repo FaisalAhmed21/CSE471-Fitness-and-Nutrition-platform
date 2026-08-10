@@ -1552,9 +1552,8 @@ def chatbot_response(request):
         if not user_message:
             return JsonResponse({'error': 'No message provided'}, status=400)
         
-        # Check if API key is configured
-        if not getattr(settings, 'OPENROUTER_API_KEY', '').strip() or settings.OPENROUTER_API_KEY == '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':
-            pass # We will allow the hardcoded key to work if they didn't set it in env for now
+        if not getattr(settings, 'OPENROUTER_API_KEY', '').strip():
+            return JsonResponse({'error': 'OpenRouter API key is not configured.'}, status=500)
         
         # Create system instructions
         system_prompt = """You are FitBot, an expert AI fitness and nutrition assistant. 
