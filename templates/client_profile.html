@@ -129,18 +129,6 @@
                                 <p><strong>Gender:</strong> {{ user.gender }}</p>
                                 <p><strong>Achievement:</strong> {{ user.achievement }}</p>
                                 <p><strong>Personal Trainer:</strong> {{ user.personalTrainer }}</p>
-                                
-                                <hr class="mt-4 mb-4">
-                                <h5 class="mb-3 text-primary">Subscription Details</h5>
-                                {% if enrollment and enrollment.paymentStatus == 'Completed' and enrollment.is_active %}
-                                    <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
-                                    <p><strong>Plan:</strong> {{ enrollment.member }}</p>
-                                    <p><strong>Valid Until:</strong> {{ enrollment.subscription_end_date|date:"F j, Y" }}</p>
-                                {% else %}
-                                    <p><strong>Status:</strong> <span class="badge badge-secondary">Not Subscribed</span></p>
-                                    <p>Ready to join? <a href="{% url 'enrollment' %}" class="text-primary font-weight-bold">Subscribe Now</a></p>
-                                {% endif %}
-                                <hr class="mt-4 mb-4">
                             </div>
 
                             <div class="text-center mt-4">

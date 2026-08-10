@@ -40,7 +40,7 @@ pip install PyJWT
 pip install cryptography
 pip install pillow
 pip install stripe
-pip install python-dotenv
+pip install google-generativeai
 ```
 
 ## Important: API Configuration
@@ -65,43 +65,27 @@ After downloading the project, you **MUST** configure your Stripe API keys to en
 3. Replace `'your_stripe_publishable_key_here'` with your actual Publishable Key
 4. Replace `'your_stripe_secret_key_here'` with your actual Secret Key
 
-**Note:** Without configuring Stripe API keys, the Stripe payment option will not work.
+**Note:** Without configuring Stripe API keys, the Stripe payment option will not work. bKash sandbox mode will work without any configuration.
 
-### OpenRouter API Configuration (Required for AI Chatbot)
+### Google Gemini API Configuration (Required for AI Chatbot)
 
-To enable the FitBot AI chatbot feature, you need a free OpenRouter API key:
+To enable the FitBot AI chatbot feature, you need a free Google Gemini API key:
 
-**Step 1: Get Your OpenRouter API Key**
-1. Visit [https://openrouter.ai/](https://openrouter.ai/)
-2. Sign in and go to API Keys
-3. Click "Create Key"
+**Step 1: Get Your Gemini API Key**
+1. Visit [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API Key"
 4. Copy the generated API key
 
 **Step 2: Update the Configuration File**
-1. Create a `.env` file in the root directory (if you haven't already).
-2. Add your OpenRouter API key:
-   ```env
-   OPENROUTER_API_KEY=your_openrouter_api_key_here
+1. Open the file: `hello/settings.py`
+2. Find this line (around line 230):
+   ```python
+   GEMINI_API_KEY = 'your_gemini_api_key_here'
    ```
+3. Replace `'your_gemini_api_key_here'` with your actual API key
 
-**Note:** The chatbot uses the `openrouter/free` tier model, meaning you will never be charged for tokens!
-
-### UddoktaPay Configuration (Required for Local Mobile Banking)
-
-To enable local payments (bKash, Nagad, etc.), you must configure your self-hosted UddoktaPay API keys:
-
-**Step 1: Get Your UddoktaPay API Keys**
-1. Log in to your self-hosted UddoktaPay Admin Dashboard.
-2. Go to **API Keys** and generate a new key with `payment:checkout` and `payment:verify` permissions.
-3. Copy the generated API key.
-
-**Step 2: Update the Configuration File**
-1. Open your `.env` file in the root directory.
-2. Add your API Key and Base URL (without `/api` at the end):
-   ```env
-   UDDOKTAPAY_API_KEY=your_uddoktapay_api_key_here
-   UDDOKTAPAY_BASE_URL=https://pay.yourwebsite.com
-   ```
+**Note:** Without configuring the Gemini API key, the chatbot will show a fallback response. The API is free with generous limits.
 
 ## Login Info:
 
@@ -149,21 +133,22 @@ To enable local payments (bKash, Nagad, etc.), you must configure your self-host
 - **AI-Powered FitBot Chatbot**
   - Real-time fitness and nutrition guidance
   - Voice input support with speech recognition
-  - Powered by OpenRouter AI (Free Tier)
+  - Powered by Google Gemini AI
 
 ### Module 3:
 - Subscription management and renewal
 - Stripe Payment Gateway (International Cards)
-- UddoktaPay Payment Gateway (Local Mobile Banking - bKash, Nagad, Rocket)
+- bKash Payment Gateway (Local Mobile Banking - Sandbox Mode)
 - Workout plan
 - Nutrition plan
 
 ## Payment Testing (Sandbox Mode):
 
-### UddoktaPay Test Mode:
-- In your UddoktaPay dashboard, enable the **Pending Payment** option in your Gateway settings.
-- Enter any dummy Transaction ID (e.g., `TEST1234`) on the checkout page.
-- Manually click **Approve** in your UddoktaPay dashboard to simulate a successful payment.
+### bKash Test Credentials:
+- **Phone Number:** Any valid 11-digit number starting with 01 (e.g., 01712345678)
+- **PIN:** Any 5-digit number (e.g., 12345)
+- **OTP:** Use the 6-digit auto-generated OTP shown on screen
+- **Note:** No real money is charged in sandbox mode
 
 ### Stripe:
 - Use Stripe test cards for testing payments
