@@ -419,8 +419,60 @@
         fitbotWindow.classList.toggle('active');
         if (fitbotWindow.classList.contains('active')) {
             fitbotInput.focus();
+            // Scroll to bottom when opened
+            fitbotMessages.scrollTop = fitbotMessages.scrollHeight;
         }
     });
+
+    // Load chat history from localStorage on load
+    function loadChatHistory() {
+        const history = JSON.parse(localStorage.getItem('fitbot_history') || '[]');
+        if (history.length > 0) {
+            // Remove the default welcome message since we have history
+            const defaultMsg = document.querySelector('.message.bot');
+            if (defaultMsg && history.length > 0) {
+                // keep the welcome message, just append history
+            }
+            
+            history.forEach(msg => {
+                addMessageToDOM(msg.text, msg.sender);
+            });
+        }
+    }
+
+    // Save message to history
+    function saveMessageToHistory(text, sender) {
+        let history = JSON.parse(localStorage.getItem('fitbot_history') || '[]');
+        history.push({ text: text, sender: sender });
+        // Keep only the last 30 messages to prevent infinite growth
+        if (history.length > 30) history = history.slice(history.length - 30);
+        localStorage.setItem('fitbot_history', JSON.stringify(history));
+    }
+
+    // Actually render the message
+    function addMessageToDOM(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = sender === 'bot' ? '🤖' : '👤';
+        
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.textContent = text;
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(content);
+        
+        const typingIndicator = document.querySelector('.typing-indicator');
+        if (typingIndicator) {
+            fitbotMessages.insertBefore(messageDiv, typingIndicator);
+        } else {
+            fitbotMessages.appendChild(messageDiv);
+        }
+        fitbotMessages.scrollTop = fitbotMessages.scrollHeight;
+    }
 
     // Send message
     function sendMessage() {
@@ -440,30 +492,14 @@
         }, 1000);
     }
 
-    // Add message to chat
+    // Add message to chat and save
     function addMessage(text, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        avatar.textContent = sender === 'bot' ? '🤖' : '👤';
-        
-        const content = document.createElement('div');
-        content.className = 'message-content';
-        content.textContent = text;
-        
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(content);
-        
-        const typingIndicator = document.querySelector('.typing-indicator');
-        if (typingIndicator) {
-            fitbotMessages.removeChild(typingIndicator);
-        }
-        
-        fitbotMessages.appendChild(messageDiv);
-        fitbotMessages.scrollTop = fitbotMessages.scrollHeight;
+        addMessageToDOM(text, sender);
+        saveMessageToHistory(text, sender);
     }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadChatHistory);
 
     // Show typing indicator
     function showTypingIndicator() {
