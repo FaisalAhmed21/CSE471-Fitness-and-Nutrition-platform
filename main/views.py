@@ -925,36 +925,15 @@ def tracker(request):
     import requests
     if request.method == 'POST':
         query = request.POST['query']
+        api_url = 'https://api.api-ninjas.com/v1/nutrition?query='
+        api_key = getattr(settings, 'NINJA_API_KEY', 'IF7UO25/zTEhl8LgzwncKw==EXlc6j1YbuGyqgJm')
+        api_request = requests.get(api_url + query, headers={'X-Api-Key': api_key})
         try:
-            # Use OpenRouter AI to generate nutritional facts since API Ninjas free tier is down
-            prompt = f"""You are a nutrition database. Provide the nutritional values for 100g of '{query}'.
-            Respond ONLY with a valid JSON array containing exactly one object with these EXACT keys: 
-            "name", "calories", "serving_size_g", "fat_total_g", "fat_saturated_g", "protein_g", "sodium_mg", "potassium_mg", "cholesterol_mg", "carbohydrates_total_g", "fiber_g", "sugar_g".
-            Do not include any markdown formatting, backticks, or extra text. Just the raw JSON array. Make sure the values are numbers (floats).
-            Example: [{{"name": "{query}", "calories": 52.0, "serving_size_g": 100.0, "fat_total_g": 0.2, "fat_saturated_g": 0.0, "protein_g": 0.3, "sodium_mg": 1, "potassium_mg": 107, "cholesterol_mg": 0, "carbohydrates_total_g": 13.8, "fiber_g": 2.4, "sugar_g": 10.4}}]"""
-            
-            headers = {
-                "Authorization": f"Bearer {getattr(settings, 'OPENROUTER_API_KEY', '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')}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": "openrouter/free",
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": 500
-            }
-            api_resp = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=15)
-            if api_resp.status_code == 200:
-                content = api_resp.json()["choices"][0]["message"]["content"].strip()
-                if content.startswith("```json"):
-                    content = content[7:-3].strip()
-                elif content.startswith("```"):
-                    content = content[3:-3].strip()
-                api = json.loads(content)
-            else:
-                raise Exception("API error")
+            api = json.loads(api_request.content)
+            print(api_request.content)
         except Exception as e:
             api = "oops! There was an error"
-            print(f"Tracker error: {e}")
+            print(e)
         return render(request, 'tracker.html', {'api': api})
     else:
         return render(request, 'tracker.html', {'query': 'Enter a valid query'})
