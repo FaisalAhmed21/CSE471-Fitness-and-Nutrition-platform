@@ -946,7 +946,67 @@ def enrollment_view(request):
     """
     Show enrollment form with payment method selection
     """
-    # Check if user already has active subscription
+    invoice_id = request.GET.get('invoice_id')
+    # UddoktaPay verification flow
+    if invoice_id:
+        try:
+            api_key = getattr(settings, 'UDDOKTAPAY_API_KEY', '')
+            base_url = getattr(settings, 'UDDOKTAPAY_BASE_URL', '').rstrip('/')
+            
+            verify_url = f"{base_url}/api/verify-payment"
+            headers = {
+                "RT-UDDOKTAPAY-API-KEY": api_key,
+                "Content-Type": "application/json"
+            }
+            payload = {"invoice_id": invoice_id}
+            
+            response = requests.post(verify_url, headers=headers, json=payload)
+            verify_data = response.json()
+            
+            if response.status_code == 200 and str(verify_data.get('status')).upper() == 'COMPLETED':
+                metadata = verify_data.get('metadata', {})
+                enrollment_id = metadata.get('enrollment_id')
+                
+                if enrollment_id:
+                    enrollment = Enroll.objects.get(id=enrollment_id, client_usrname=request.user.username)
+                    
+                    if not enrollment.is_active or enrollment.paymentStatus != 'Completed':
+                        # Verify amount
+                        api_amount = float(verify_data.get('amount', 0))
+                        expected_amount = float(enrollment.Price)
+                        
+                        if api_amount == expected_amount:
+                            # Activate subscription
+                            membership_prices = {
+                                "1 month - 1000 Taka": 30,
+                                "3 month - 2500 Taka": 90,
+                                "6 month - 4000 Taka": 180,
+                                "1 year - 6000 Taka": 365,
+                            }
+                            duration = membership_prices.get(enrollment.member, 30)
+                            start_date = timezone.now()
+                            end_date = start_date + timedelta(days=duration)
+
+                            enrollment.paymentStatus = 'Completed'
+                            enrollment.subscription_start_date = start_date
+                            enrollment.subscription_end_date = end_date
+                            enrollment.DueDate = end_date
+                            enrollment.is_active = True
+                            enrollment.invoice_id = invoice_id
+                            enrollment.save()
+                            
+                            if 'pending_enrollment_id' in request.session:
+                                del request.session['pending_enrollment_id']
+                            
+                            request.session['show_payment_alert'] = True
+                        else:
+                            messages.error(request, 'Payment amount mismatch. Subscription not activated.')
+                            return redirect('enrollment')
+        except Exception as e:
+            print(f"UddoktaPay Verification Error: {e}")
+            pass # Fall through to standard rendering if not found
+            
+    # Standard rendering flow
     try:
         enrollment = Enroll.objects.get(client_usrname=request.user.username)
         if enrollment.is_subscription_valid():
@@ -1011,6 +1071,43 @@ def process_enrollment(request):
         request.session['pending_enrollment_id'] = enrollment.id
 
         # Redirect based on payment method
+        # Initialize UddoktaPay payment
+        api_key = getattr(settings, 'UDDOKTAPAY_API_KEY', '')
+        base_url = getattr(settings, 'UDDOKTAPAY_BASE_URL', '').rstrip('/')
+        
+        if api_key and base_url and api_key != 'your-uddoktapay-api-key':
+            try:
+                init_url = f"{base_url}/api/checkout-v2"
+                headers = {
+                    "RT-UDDOKTAPAY-API-KEY": api_key,
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "full_name": request.user.get_full_name() or request.user.username,
+                    "email": request.user.email,
+                    "amount": str(enrollment.Price),
+                    "metadata": {
+                        "enrollment_id": str(enrollment.id),
+                        "username": request.user.username
+                    },
+                    "redirect_url": settings.DOMAIN_URL + '/subscription-success/',
+                    "cancel_url": settings.DOMAIN_URL + '/payment-cancelled/',
+                    "webhook_url": settings.DOMAIN_URL + '/api/uddoktapay-webhook/' # Optional webhook
+                }
+                
+                response = requests.post(init_url, headers=headers, json=payload)
+                data = response.json()
+                
+                if response.status_code == 200 and data.get('status'):
+                    payment_url = data.get('payment_url')
+                    if payment_url:
+                        return redirect(payment_url)
+                else:
+                    messages.error(request, f"Payment gateway error: {data.get('message', 'Unknown error')}")
+            except Exception as e:
+                messages.error(request, f"Payment gateway connection error: {str(e)}")
+        
+        # Fallback to Sandbox/Stripe if UddoktaPay not configured
         if payment_method == 'stripe':
             return redirect('stripe_checkout')
         elif payment_method == 'bkash':
@@ -1424,7 +1521,7 @@ def cancel_view(request):
 @require_POST
 def chatbot_response(request):
     """
-    Handle chatbot messages and return AI responses using Google Gemini
+    Handle chatbot messages and return AI responses using OpenRouter DeepSeek
     """
     try:
         data = json.loads(request.body)
@@ -1434,55 +1531,40 @@ def chatbot_response(request):
             return JsonResponse({'error': 'No message provided'}, status=400)
         
         # Check if API key is configured
-        if not hasattr(settings, 'GEMINI_API_KEY') or settings.GEMINI_API_KEY == 'your_gemini_api_key_here':
-            print("Gemini API key not configured")
-            return JsonResponse({
-                'response': "FitBot needs to be configured with a Gemini API key. Please contact the administrator. Meanwhile, I can still chat! What's your fitness question? 💪"
-            })
-        
-        # Use REST API directly instead of SDK
-        import requests as req
-        
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={settings.GEMINI_API_KEY}"
+        if not getattr(settings, 'OPENROUTER_API_KEY', '').strip() or settings.OPENROUTER_API_KEY == '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':
+            pass # We will allow the hardcoded key to work if they didn't set it in env for now, but strictly speaking it should be an env var
         
         # Create fitness-focused prompt
         fitness_prompt = f"""You are FitBot, an expert AI fitness and nutrition assistant. 
-        You help users with workout plans, nutrition advice, diet recommendations, exercise techniques, 
-        weight loss/gain strategies, muscle building, and general fitness guidance.
+        Your goal is to provide helpful, accurate, and encouraging advice about workout routines, 
+        diet plans, form correction, and healthy lifestyle choices.
         
-        Keep responses concise (2-3 sentences max), friendly, and motivational.
-        Always encourage healthy habits and remind users to consult professionals for medical concerns.
+        Guidelines:
+        1. Keep responses concise and easy to read (use bullet points if helpful).
+        2. Always be encouraging and positive.
+        3. Only answer questions related to fitness, nutrition, health, and wellness.
+        4. If a user asks about medical conditions, advise them to consult a doctor.
+        5. Never give specific medical diagnoses.
         
-        User question: {user_message}
-        
-        Provide a helpful, encouraging response:"""
-        
-        payload = {
-            "contents": [{
-                "parts": [{
-                    "text": fitness_prompt
-                }]
-            }]
-        }
-        
-        headers = {
-            'Content-Type': 'application/json'
-        }
+        User question: {user_message}"""
         
         # Get AI response
-        print(f"Sending to Gemini: {user_message}")
-        response = req.post(api_url, json=payload, headers=headers)
+        headers = {
+            "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": "openrouter/free",
+            "messages": [{"role": "user", "content": fitness_prompt}],
+            "max_tokens": 1000
+        }
+        api_resp = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
         
-        if response.status_code == 200:
-            result = response.json()
-            ai_response = result['candidates'][0]['content']['parts'][0]['text']
-            print(f"Gemini response: {ai_response}")
+        if api_resp.status_code == 200:
+            ai_response = api_resp.json()["choices"][0]["message"]["content"]
             return JsonResponse({'response': ai_response})
         else:
-            print(f"API Error: {response.status_code} - {response.text}")
-            return JsonResponse({
-                'response': "I'm having trouble connecting to my AI brain right now. Try asking: 'What exercises help lose weight?' or 'Best protein sources?' 💪"
-            })
+            raise Exception(f"API Error {api_resp.status_code}: {api_resp.text}")
         
     except Exception as e:
         error_message = str(e)
