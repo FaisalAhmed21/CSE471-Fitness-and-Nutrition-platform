@@ -1,93 +1,66 @@
 # Fitness and Nutrition Platform
 **CSE471: System Analysis and Design (group project)**
 
-## Language used:
-HTML, CSS, JS, Python, SQLite
+Our Fitness & Nutrition platform is a comprehensive digital ecosystem that empowers users to reach their health goals through personalized programs, educational content, and community support. The system delivers tailored workout and meal plans with media-rich content, automated BMI and progress tracking, and integrated subscription payments, all accessible from intuitive role-based dashboards (clients, trainers, owners). Users also benefit from tutorial modules, a highly scalable discussion forum, and an AI chatbot for on-demand coaching and support.
 
-## Framework / Library:
-Django, Bootstrap, Stripe API
+## 🚀 Technology Stack & Architecture
 
-## DBMS:
-PostgreSQL (Supabase) / SQLite (Local Development)
+- **Languages:** HTML, CSS, JS, Python
+- **Framework:** Django 5.1, Bootstrap
+- **Database:** PostgreSQL (Production on Supabase) / SQLite (Local Development)
+- **Deployment:** Render (PaaS Hosting)
+- **Static Asset Management:** WhiteNoise
+- **Payments:** Stripe API (International), UDDOKTAPAY/bKash (Local)
+- **Authentication:** Django Allauth (Google & GitHub OAuth)
+- **AI Integration:** OpenRouter (DeepSeek/LLMs)
+- **Nutrition Data:** Official USDA FoodData Central API
 
-## Used Django Features:
-- Django Model
-- Django Admin
-- Django Static Files
-- Django Templates
-- Django Authentication
-- Django Allauth (Social Authentication - Google & GitHub)
-- Django Signals
-- Django Middleware
-- Django Session Management
-- **Deployment:** Render (Hosting) & Supabase (PostgreSQL)
+## 🏗️ Architectural Highlights (Deep Analysis)
 
-## Brief Idea About Our Project:
-Our Fitness & Nutrition platform is a comprehensive digital ecosystem that empowers users to reach their health goals through personalized programs, educational content, and community support. The system delivers tailored workout and meal plans with media-rich content, automated BMI and progress tracking, and integrated subscription payments, all accessible from intuitive role-based dashboards (clients, trainers, owners). Users also benefit from tutorial modules, a discussion forum for peer and expert interaction, and an AI chatbot for on-demand coaching and support.
+- **Scalable Community Forum:** The discussion forum utilizes PostgreSQL's robust concurrency control. This completely eliminates the `database is locked` errors common in SQLite, allowing thousands of users to upvote and reply simultaneously without crashing the application.
+- **Secure Premium Content Delivery:** The Diet (`Plan`) and Workout (`wPlan`) architectures use a Parent-Child relationship. More importantly, they employ `uuid.uuid4` (Universally Unique Identifiers) for their Primary Keys instead of auto-incrementing integers. This prevents URL manipulation and securely protects premium content from unauthorized access.
+- **Environment-Driven Configuration:** All sensitive secrets, API keys, and database URLs have been completely decoupled from the source code and are injected dynamically via `.env` files in development and Environment Variables in production.
+- **Progress Tracking:** The `BMIRecord` system accurately tracks user health data over time, ordering records chronologically to provide seamless frontend charting.
 
-## To Run the Server:
-In VS Code, open the folder `Fitness and Nutrition platform/hello` and then type `python manage.py runserver` in a new terminal. Run this command from project directory (hello).
+---
 
-## Commands That May Be Required:
+## 🛠️ Local Development Setup
+
+To run the server locally, clone the repository and run the following commands in the root directory:
+
 ```bash
-pip install django
-pip install django-jazzmin
-pip install mysql
-pip install middleware
-pip install django-allauth
-pip install django-mathfilters
-pip install requests
-pip install PyJWT
-pip install cryptography
-pip install pillow
-pip install stripe
-pip install google-generativeai
+# Install dependencies
+pip install django django-jazzmin middleware django-allauth django-mathfilters requests PyJWT cryptography pillow stripe gunicorn whitenoise dj-database-url python-dotenv psycopg2-binary
+
+# Apply migrations
+python manage.py migrate
+
+# Run the server
+python manage.py runserver
 ```
 
-## Important: API Configuration
+## 🔑 Environment Variables & API Configuration
 
-### Stripe API Configuration (Required for Payment Features)
+For the platform to function correctly, you **MUST** create a `.env` file in your root folder (where `manage.py` is located) and configure the following variables.
 
-After downloading the project, you **MUST** configure your Stripe API keys to enable payment features:
+### 1. Payment Gateways (Stripe & UDDOKTAPAY)
+```env
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
 
-**Step 1: Get Your Stripe API Keys**
-1. Create a free account at [https://stripe.com](https://stripe.com)
-2. Go to Stripe Dashboard → Developers → API Keys
-3. Copy your **Publishable Key** (starts with `pk_test_...`)
-4. Copy your **Secret Key** (starts with `sk_test_...`)
-
-**Step 2: Update the Configuration File**
-1. Open the file: `hello/settings.py`
-2. Find these lines (around line 160-165):
-   ```python
-   STRIPE_PUBLIC_KEY = 'your_stripe_publishable_key_here'
-   STRIPE_SECRET_KEY = 'your_stripe_secret_key_here'
-   ```
-3. Replace `'your_stripe_publishable_key_here'` with your actual Publishable Key
-4. Replace `'your_stripe_secret_key_here'` with your actual Secret Key
-
-**Note:** Without configuring Stripe API keys, the Stripe payment option will not work. bKash sandbox mode will work without any configuration.
-
-### OpenRouter API Configuration (Required for AI Chatbot)
-
-To enable the FitBot AI chatbot feature, you need a free OpenRouter API key:
-
-**Step 1: Get Your OpenRouter API Key**
-1. Visit [https://openrouter.ai/](https://openrouter.ai/)
-2. Sign in with your Google account
-3. Click on "Keys" and generate a new API key
-
-**Step 2: Update the Configuration File**
-Create a `.env` file in your root folder and add:
-```
-OPENROUTER_API_KEY=your_openrouter_api_key_here
+UDDOKTAPAY_API_KEY=your_api_key_here
+UDDOKTAPAY_BASE_URL=https://your-uddoktapay-url.com
 ```
 
-### Social Authentication Configuration (Google & GitHub)
+### 2. FitBot AI Chatbot (OpenRouter)
+Our AI Chatbot features a LocalStorage memory to remember conversation context. To enable the AI brain, get a free key from [OpenRouter](https://openrouter.ai/).
+```env
+OPENROUTER_API_KEY=sk-or-v1-...
+```
+
+### 3. Social Authentication (Google & GitHub)
 Social logins are configured directly via Environment Variables to prevent database synchronization issues during deployment.
-
-Create a `.env` file in your root folder and add your OAuth keys:
-```
+```env
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 
@@ -95,77 +68,70 @@ GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 ```
 
-### USDA FoodData Central API (Required for Nutrition Tracker)
-The nutrition tracking feature uses the official USDA API. It works with a default DEMO_KEY, but you can configure your own key for higher rate limits.
-Add this to your `.env` file:
-```
+### 4. Nutrition Tracker (USDA API)
+The nutrition tracking feature uses the official USDA API. It works with a default `DEMO_KEY`, but you can configure your own key for higher rate limits.
+```env
 USDA_API_KEY=your_usda_api_key_here
 ```
 
-## Login Info:
+---
 
-### Clients' usernames are:
-**Username:** nazia  
-**Password:** 1
+## 👤 Default Login Information
 
-**Username:** shuvo  
-**Password:** 12345578p
+### Clients
+- **Username:** nazia | **Password:** 1
+- **Username:** shuvo | **Password:** 12345578p
 
-### Trainer username:
-**Username:** apple  
-**Password:** apple123apple
+### Trainers
+- **Username:** apple | **Password:** apple123apple
 
-### Owner username:
-**Username:** aa  
-**Password:** 147852mm
+### Owner
+- **Username:** aa | **Password:** 147852mm
 
-### Admin:
-**Username:** admin  
-**Password:** admin
+### Admin
+- **Username:** admin | **Password:** admin
 
-## Project Features:
+---
 
-### Module 1:
-- Log in, Log out
-- Sign Up / Registration
-- View Profile
-- Edit Profile
+## 🌟 Project Features
+
+### Module 1: Authentication & User Management
+- Log in, Log out, Sign Up
+- View & Edit Profile
 - Reset Password
-- Gmail Authentication
-- GitHub Authentication
-- Delete Profile using the actual password
+- Google & GitHub OAuth Authentication
+- Secure Profile Deletion
 
-### Module 2:
-### Module 2:
-- Notification reminder
-- BMI page
-- Exercise video tutorial play
-- Nutrition values (Powered by official USDA FoodData Central Database)
+### Module 2: Health, Content & Community
+- Notification reminders
+- BMI Tracking & History page
+- Exercise video tutorial player
+- Real-time Nutrition Tracker (Powered by the official USDA FoodData Central Database)
 - Support and FAQs
-- Community Discussion Forum
-  - Post, view, and reply to discussions
-  - One-time upvote and unique view tracking per user
-- **AI-Powered FitBot Chatbot**
-  - Real-time fitness and nutrition guidance
-  - Powered by OpenRouter AI
+- **Community Discussion Forum:** Post, view, and reply to discussions with view tracking and one-time upvoting.
+- **AI-Powered FitBot Chatbot:** Features conversational memory, real-time fitness guidance, and form correction via OpenRouter AI.
 
-### Module 3:
+### Module 3: Premium Plans & Payments
 - Subscription management and renewal
 - Stripe Payment Gateway (International Cards)
-- bKash Payment Gateway (Local Mobile Banking - Sandbox Mode)
-- Workout plan
-- Nutrition plan
+- bKash Payment Gateway (Local Mobile Banking)
+- Secure, UUID-protected Workout Plans
+- Secure, UUID-protected Nutrition Plans
 
-## Payment Testing (Sandbox Mode):
+---
 
-### bKash Test Credentials:
-- **Phone Number:** Any valid 11-digit number starting with 01 (e.g., 01712345678)
-- **PIN:** Any 5-digit number (e.g., 12345)
+## 💳 Payment Testing (Sandbox Mode)
+
+### bKash Test Credentials
+- **Phone Number:** Any valid 11-digit number starting with 01 (e.g., `01712345678`)
+- **PIN:** Any 5-digit number (e.g., `12345`)
 - **OTP:** Use the 6-digit auto-generated OTP shown on screen
-- **Note:** No real money is charged in sandbox mode
+- *No real money is charged in sandbox mode.*
 
-### Stripe:
-- Use Stripe test cards for testing payments
+### Stripe Test Credentials
+- Use official Stripe test cards for simulating successful or declined payments.
 
-### Contributors
+---
+
+## 👥 Contributors
 [Faisal Ahmed](https://github.com/FaisalAhmed21) | [MD. Shafiur Rahman](https://github.com/ShafiurShuvo) | [Nazia Mumtahina](https://github.com/NaziaMumtahina) | [Sara Jerin Prithila](https://github.com/jerinsync)
