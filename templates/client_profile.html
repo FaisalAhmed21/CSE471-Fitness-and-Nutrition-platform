@@ -129,20 +129,6 @@
                                 <p><strong>Gender:</strong> {{ user.gender }}</p>
                                 <p><strong>Achievement:</strong> {{ user.achievement }}</p>
                                 <p><strong>Personal Trainer:</strong> {{ user.personalTrainer }}</p>
-                                {% if enrollment %}
-                                <hr>
-                                <h5 class="mt-3">Subscription Details</h5>
-                                <p><strong>Plan:</strong> {{ enrollment.membership_plan.name }}</p>
-                                <p><strong>Status:</strong> 
-                                    {% if enrollment.is_active %}
-                                        <span class="badge badge-success">Active</span>
-                                    {% else %}
-                                        <span class="badge badge-danger">Inactive/Expired</span>
-                                    {% endif %}
-                                </p>
-                                <p><strong>Start Date:</strong> {{ enrollment.enrollment_date|date:"F j, Y" }}</p>
-                                <p><strong>Valid Until:</strong> {{ enrollment.end_date|date:"F j, Y" }}</p>
-                                {% endif %}
                             </div>
 
                             <div class="text-center mt-4">

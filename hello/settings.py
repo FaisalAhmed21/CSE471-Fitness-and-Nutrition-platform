@@ -196,6 +196,11 @@ SOCIALACCOUNT_PROVIDERS = {
         'VERSION': 'v2',
     },
     'github': {
+        'APP': {
+            'client_id': os.getenv('GITHUB_CLIENT_ID', ''),
+            'secret': os.getenv('GITHUB_CLIENT_SECRET', ''),
+            'key': ''
+        },
         'SCOPE': [
             'user',
             'repo',
