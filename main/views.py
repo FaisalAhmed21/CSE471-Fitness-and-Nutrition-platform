@@ -1547,27 +1547,41 @@ def chatbot_response(request):
     try:
         data = json.loads(request.body)
         user_message = data.get('message', '').strip()
+        history = data.get('history', [])
         
         if not user_message:
             return JsonResponse({'error': 'No message provided'}, status=400)
         
         # Check if API key is configured
         if not getattr(settings, 'OPENROUTER_API_KEY', '').strip() or settings.OPENROUTER_API_KEY == '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':
-            pass # We will allow the hardcoded key to work if they didn't set it in env for now, but strictly speaking it should be an env var
+            pass # We will allow the hardcoded key to work if they didn't set it in env for now
         
-        # Create fitness-focused prompt
-        fitness_prompt = f"""You are FitBot, an expert AI fitness and nutrition assistant. 
-        Your goal is to provide helpful, accurate, and encouraging advice about workout routines, 
-        diet plans, form correction, and healthy lifestyle choices.
+        # Create system instructions
+        system_prompt = """You are FitBot, an expert AI fitness and nutrition assistant. 
+        Your goal is to provide helpful, accurate, and encouraging advice about workout routines, diet plans, form correction, and healthy lifestyle choices.
         
         Guidelines:
         1. Keep responses concise and easy to read (use bullet points if helpful).
         2. Always be encouraging and positive.
         3. Only answer questions related to fitness, nutrition, health, and wellness.
         4. If a user asks about medical conditions, advise them to consult a doctor.
-        5. Never give specific medical diagnoses.
+        5. Never give specific medical diagnoses."""
         
-        User question: {user_message}"""
+        # Construct the message array with the system prompt first
+        api_messages = [{"role": "system", "content": system_prompt}]
+        
+        # Append the chat history (limit to last 10 messages for context window)
+        # We only take the last 10 messages to keep the payload size reasonable
+        recent_history = history[-10:] if history else []
+        for msg in recent_history:
+            role = "assistant" if msg.get("sender") == "bot" else "user"
+            content = msg.get("text", "")
+            if content:
+                api_messages.append({"role": role, "content": content})
+                
+        # If history didn't include the current user message (e.g. from an old script version), append it
+        if not history or history[-1].get("text") != user_message:
+            api_messages.append({"role": "user", "content": user_message})
         
         # Get AI response
         headers = {
@@ -1576,10 +1590,10 @@ def chatbot_response(request):
         }
         payload = {
             "model": "openrouter/free",
-            "messages": [{"role": "user", "content": fitness_prompt}],
+            "messages": api_messages,
             "max_tokens": 1000
         }
-        api_resp = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+        api_resp = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=20)
         
         if api_resp.status_code == 200:
             ai_response = api_resp.json()["choices"][0]["message"]["content"]

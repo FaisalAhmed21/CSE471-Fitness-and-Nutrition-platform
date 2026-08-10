@@ -510,16 +510,22 @@
         fitbotMessages.scrollTop = fitbotMessages.scrollHeight;
     }
 
-    // Get AI response (using Gemini API)
+    // Get AI response (using OpenRouter API)
     async function getAIResponse(userMessage) {
         try {
+            // Get current history to send as context
+            const history = JSON.parse(localStorage.getItem('fitbot_history') || '[]');
+            
             const response = await fetch('/chatbot-response/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
-                body: JSON.stringify({ message: userMessage })
+                body: JSON.stringify({ 
+                    message: userMessage,
+                    history: history 
+                })
             });
 
             const data = await response.json();
